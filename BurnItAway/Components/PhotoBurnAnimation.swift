@@ -13,21 +13,14 @@ class PhotoBurnAnimationController: ObservableObject {
     let onComplete: () -> Void
     
     @Published var burnProgress: Double = 0.0
-    @Published var showFire = false
     @Published var imageOpacity: Double = 1.0
-    @Published var fireIntensity: Double = 0.0
     @Published var showCompletion = false
-    @Published var showHeatDistortion = false
-    @Published var showBreathingIndicator = false
     @Published var isAnimating = false
     @Published var animationPhase: String = "preparing"
-    @Published var showBurningParticles = false
-    @Published var burningParticleIntensity: Double = 0.0
     
     private var animationTimer: Timer?
     private var displayLink: CADisplayLink?
     private var burnStartTime: CFTimeInterval = 0
-    private var fireSoundManager = FireSoundManager()
     private var isCleanedUp = false
     
     init(image: UIImage?, onComplete: @escaping () -> Void) {
@@ -72,73 +65,16 @@ class PhotoBurnAnimationController: ObservableObject {
         return t < 0.5 ? 8 * t * t * t * t : 1 - pow(-2 * t + 2, 4) / 2
     }
     
-    // Enhanced fire intensity animation like text burning
-    private func startFireIntensityAnimation() {
-        // Start with low intensity and build up gradually
-        fireIntensity = 0.0
-        
-        // Build up fire intensity over 3 seconds
-        withAnimation(.easeInOut(duration: 3.0)) {
-            fireIntensity = 1.0
-        }
-        
-        // Start burning particles after fire intensity builds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            guard !self.isCleanedUp else { return }
-            withAnimation(.easeInOut(duration: 0.5)) {
-                self.showBurningParticles = true
-            }
-            self.startBurningParticleAnimation()
-        }
-    }
-    
-    // Enhanced burning particle animation
-    private func startBurningParticleAnimation() {
-        // Animate burning particle intensity
-        withAnimation(.easeInOut(duration: 2.0)) {
-            burningParticleIntensity = 1.0
-        }
-    }
     
     func startBurnAnimation() {
         guard !isCleanedUp else { return }
         
-        print("🔥 Starting burn animation...")
+        print("🔥 Starting video-based burn animation...")
         isAnimating = true
         animationPhase = "starting"
         
         // Add haptic feedback for animation start
         HapticFeedback.medium()
-        
-        // Start with breathing indicator (immediate)
-        withAnimation(.easeInOut(duration: 1.0)) {
-            showBreathingIndicator = true
-        }
-        print("🔥 Breathing indicator started")
-        
-        // Start heat distortion after brief delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            guard !self.isCleanedUp else { return }
-            print("🔥 Starting heat distortion...")
-            withAnimation(.easeInOut(duration: 0.5)) {
-                self.showHeatDistortion = true
-            }
-        }
-        
-        // Start fire effect and sound together
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-            guard !self.isCleanedUp else { return }
-            print("🔥 Starting fire effect and sound...")
-            withAnimation(.easeInOut(duration: 0.5)) {
-                self.showFire = true
-            }
-            // Start fire sound when fire appears
-            self.fireSoundManager.startFireSounds()
-            self.animationPhase = "burning"
-            
-            // Start enhanced fire intensity animation
-            self.startFireIntensityAnimation()
-        }
         
         // Begin burning process immediately (no delay)
         print("🔥 Starting burn timer...")
@@ -163,13 +99,7 @@ class PhotoBurnAnimationController: ObservableObject {
         // Add haptic feedback for completion
         HapticFeedback.success()
         
-        // Start gradual fire fade-out after 8 seconds (same as text burning)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 8.0) {
-            guard !self.isCleanedUp else { return }
-            self.startFireFadeOut()
-        }
-        
-        // Show completion message after full burning sequence (15s total, same as text burning)
+        // Show completion message after video completes (15s total, same as text burning)
         DispatchQueue.main.asyncAfter(deadline: .now() + 15.0) {
             guard !self.isCleanedUp else { return }
             print("🔥 Showing completion message...")
@@ -180,77 +110,6 @@ class PhotoBurnAnimationController: ObservableObject {
         }
     }
     
-    private func startFireFadeOut() {
-        guard !isCleanedUp else { return }
-        
-        print("🔥 Starting gradual fire fade-out...")
-        animationPhase = "fading"
-        
-        // Start fading burning particles first
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            guard !self.isCleanedUp else { return }
-            print("🔥 Fading out burning particles...")
-            withAnimation(.easeOut(duration: 2.0)) {
-                self.burningParticleIntensity = 0.0
-            }
-        }
-        
-        // Gradually reduce fire intensity over 7 seconds
-        withAnimation(.easeOut(duration: 7.0)) {
-            fireIntensity = 0.0
-        }
-        
-        // Fade out visual elements gradually
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            guard !self.isCleanedUp else { return }
-            print("🔥 Fading out heat distortion...")
-            withAnimation(.easeOut(duration: 3.0)) {
-                self.showHeatDistortion = false
-            }
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
-            guard !self.isCleanedUp else { return }
-            print("🔥 Fading out breathing indicator...")
-            withAnimation(.easeOut(duration: 2.0)) {
-                self.showBreathingIndicator = false
-            }
-        }
-        
-        // Stop fire sound gradually
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-            guard !self.isCleanedUp else { return }
-            print("🔥 Stopping fire sounds...")
-            self.fireSoundManager.stopFireSounds()
-        }
-        
-        // Finally fade out the fire completely
-        DispatchQueue.main.asyncAfter(deadline: .now() + 7.0) {
-            guard !self.isCleanedUp else { return }
-            print("🔥 Fading out fire completely...")
-            withAnimation(.easeOut(duration: 1.0)) {
-                self.showFire = false
-            }
-        }
-        
-        // Fade out burning particles completely
-        DispatchQueue.main.asyncAfter(deadline: .now() + 7.5) {
-            guard !self.isCleanedUp else { return }
-            print("🔥 Fading out burning particles completely...")
-            withAnimation(.easeOut(duration: 0.5)) {
-                self.showBurningParticles = false
-            }
-        }
-        
-        // Don't auto-complete - let the user tap Continue button to complete
-        
-        // Clean up timers after fade-out
-        DispatchQueue.main.asyncAfter(deadline: .now() + 8.0) {
-            guard !self.isCleanedUp else { return }
-            print("🔥 Cleaning up timers...")
-            self.cleanup()
-        }
-    }
     
     func completeAnimation() {
         print("🔥 Animation completed, calling onComplete...")
@@ -269,7 +128,6 @@ class PhotoBurnAnimationController: ObservableObject {
         animationTimer = nil
         displayLink?.invalidate()
         displayLink = nil
-        fireSoundManager.stopFireSounds()
         isAnimating = false
     }
     
@@ -332,35 +190,16 @@ struct PhotoBurnAnimation: View {
     @ViewBuilder
     private var mainAnimationView: some View {
         ZStack {
-            // Background effects
-            if controller.showBreathingIndicator {
-                BreathingIndicator()
-                    .position(x: UIScreen.main.bounds.width / 2, y: 100)
-                    .transition(.opacity.combined(with: .scale))
-            }
+            // Use the same video-based burning system as text burning
+            RealAnimationContainer(
+                source: RealAnimationManager.fireVideo,
+                text: "Burning Memory",
+                onComplete: {
+                    controller.completeAnimation()
+                }
+            )
             
-            if controller.showHeatDistortion {
-                HeatDistortionView(isActive: controller.showHeatDistortion, intensity: controller.fireIntensity)
-                    .ignoresSafeArea(.all)
-                    .transition(.opacity)
-            }
-            
-            if controller.showFire {
-                AdvancedFireView(isActive: controller.showFire, intensity: controller.fireIntensity)
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                    .ignoresSafeArea(.all)
-                    .transition(.opacity.combined(with: .scale))
-            }
-            
-            // Enhanced burning particles
-            if controller.showBurningParticles {
-                BurningParticlesView(intensity: controller.burningParticleIntensity)
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                    .ignoresSafeArea(.all)
-                    .transition(.opacity)
-            }
-            
-            // Main content
+            // Photo overlay on top of video
             VStack(spacing: CalmDesignSystem.Spacing.lg) {
                 Spacer()
                 
@@ -386,8 +225,25 @@ struct PhotoBurnAnimation: View {
                 fallbackImageView()
             }
         }
-        .opacity(controller.burnProgress > 0.95 ? 0.0 : 1.0)
-        .animation(.easeInOut(duration: 1.0), value: controller.burnProgress)
+        .opacity(controller.burnProgress > 0.8 ? 0.0 : 1.0)
+        .animation(.easeInOut(duration: 2.0), value: controller.burnProgress)
+        .overlay(
+            // Add a subtle glow effect that matches the video
+            RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.orange.opacity(0.3),
+                            Color.red.opacity(0.2),
+                            Color.yellow.opacity(0.1)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .opacity(controller.burnProgress > 0.3 ? controller.burnProgress * 0.5 : 0.0)
+                .animation(.easeInOut(duration: 1.0), value: controller.burnProgress)
+        )
     }
     
     @ViewBuilder
@@ -395,19 +251,19 @@ struct PhotoBurnAnimation: View {
         VStack(spacing: CalmDesignSystem.Spacing.md) {
             Text("Burning away...")
                 .font(CalmDesignSystem.Typography.caption)
-                .foregroundColor(CalmDesignSystem.Colors.textSecondary)
-                .opacity(controller.showFire ? 1.0 : 0.0)
+                .foregroundColor(.white.opacity(0.9))
+                .opacity(controller.burnProgress > 0.1 ? 1.0 : 0.0)
                 .accessibilityLabel("Burning memory")
                 .accessibilityValue("Progress: \(Int(controller.burnProgress * 100)) percent")
             
             Text("Symbolic burning only - your photo is safe")
                 .font(CalmDesignSystem.Typography.caption)
-                .foregroundColor(CalmDesignSystem.Colors.textSecondary)
-                .opacity(controller.showFire ? 0.8 : 0.0)
+                .foregroundColor(.white.opacity(0.7))
                 .multilineTextAlignment(.center)
+                .opacity(controller.burnProgress > 0.2 ? 0.8 : 0.0)
                 .accessibilityLabel("Symbolic burning only - your photo is safe")
         }
-        .animation(.easeInOut(duration: 0.5), value: controller.showFire)
+        .animation(.easeInOut(duration: 1.0), value: controller.burnProgress)
     }
     
     @ViewBuilder
