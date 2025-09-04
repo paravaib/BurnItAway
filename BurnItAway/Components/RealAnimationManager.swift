@@ -281,15 +281,16 @@ struct LottieAnimationView: View {
 // MARK: - Real Animation Container
 struct RealAnimationContainer: View {
     let source: RealAnimationManager.AnimationSource
+    let text: String
     let onComplete: (() -> Void)?
     
     @State private var animationComplete = false
+    @State private var textOpacity: Double = 1.0
+    @State private var animationStartTime: Date = Date()
     
     var body: some View {
         ZStack {
-            // Add a background color to see if the container is rendering
-            Color.black.ignoresSafeArea()
-            
+            // Background animation
             switch source.type {
             case .gif:
                 GIFAnimationView(
@@ -300,6 +301,7 @@ struct RealAnimationContainer: View {
                 .onAppear {
                     print("🎬 Rendering GIF: \(source.fileName)")
                     print("🎬 GIF appeared")
+                    startTextFadeAnimation()
                     if let duration = source.duration {
                         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                             animationComplete = true
@@ -316,6 +318,7 @@ struct RealAnimationContainer: View {
                 .onAppear {
                     print("🎬 Rendering Video: \(source.fileName)")
                     print("🎬 Video appeared")
+                    startTextFadeAnimation()
                     if let duration = source.duration {
                         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                             animationComplete = true
@@ -333,6 +336,7 @@ struct RealAnimationContainer: View {
                 .onAppear {
                     print("🎬 Rendering Lottie: \(source.fileName)")
                     print("🎬 Lottie appeared")
+                    startTextFadeAnimation()
                     if let duration = source.duration {
                         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                             animationComplete = true
@@ -355,12 +359,102 @@ struct RealAnimationContainer: View {
                 .background(Color.clear)
                 .onAppear {
                     print("🎬 Rendering SpriteKit placeholder")
+                    startTextFadeAnimation()
+                }
+            }
+            
+            // Text overlay that fades away
+            if !text.isEmpty {
+                VStack {
+                    Spacer()
+                    
+                    Text(text)
+                        .font(CalmDesignSystem.Typography.largeTitle)
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.black.opacity(0.3))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                                )
+                        )
+                        .opacity(textOpacity)
+                        .scaleEffect(textOpacity > 0.5 ? 1.0 : 0.8)
+                        .animation(.easeInOut(duration: 0.5), value: textOpacity)
+                    
+                    Spacer()
+                }
+            }
+            
+            // Progress indicator
+            if !animationComplete {
+                VStack {
+                    Spacer()
+                    
+                    VStack(spacing: CalmDesignSystem.Spacing.md) {
+                        Text(getProgressText())
+                            .font(CalmDesignSystem.Typography.caption)
+                            .foregroundColor(.white.opacity(0.8))
+                            .opacity(textOpacity > 0.3 ? 1.0 : 0.0)
+                            .animation(.easeInOut(duration: 0.5), value: textOpacity)
+                        
+                        Text("Symbolic \(getRitualName()) only - your thoughts are safe")
+                            .font(CalmDesignSystem.Typography.caption)
+                            .foregroundColor(.white.opacity(0.6))
+                            .multilineTextAlignment(.center)
+                            .opacity(textOpacity > 0.3 ? 0.8 : 0.0)
+                            .animation(.easeInOut(duration: 0.5), value: textOpacity)
+                    }
+                    .padding(.bottom, CalmDesignSystem.Spacing.xxxl)
                 }
             }
         }
         .ignoresSafeArea()
         .onAppear {
             print("🎬 RealAnimationContainer appeared with type: \(source.type), file: \(source.fileName)")
+            animationStartTime = Date()
+        }
+    }
+    
+    private func startTextFadeAnimation() {
+        // Start fading text after 2 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            withAnimation(.easeInOut(duration: 3.0)) {
+                textOpacity = 0.0
+            }
+        }
+    }
+    
+    private func getProgressText() -> String {
+        switch source.fileName {
+        case "fire_background":
+            return "Burning away..."
+        case "shred_background":
+            return "Shredding away..."
+        case "soil_background":
+            return "Burying in earth..."
+        case "water_background":
+            return "Washing away..."
+        default:
+            return "Releasing..."
+        }
+    }
+    
+    private func getRitualName() -> String {
+        switch source.fileName {
+        case "fire_background":
+            return "burning"
+        case "shred_background":
+            return "shredding"
+        case "soil_background":
+            return "burying"
+        case "water_background":
+            return "washing"
+        default:
+            return "release"
         }
     }
 }
@@ -376,14 +470,14 @@ struct EnhancedRitualView: View {
     
     var body: some View {
         ZStack {
-            if showRealAnimation, let source = animationSource {
-                RealAnimationContainer(source: source) {
-                    onComplete()
-                }
-            } else {
-                // Fallback to current animations
-                fallbackView
+                    if showRealAnimation, let source = animationSource {
+            RealAnimationContainer(source: source, text: text) {
+                onComplete()
             }
+        } else {
+            // Fallback to current animations
+            fallbackView
+        }
         }
         .onAppear {
             loadRealAnimation()
@@ -471,7 +565,7 @@ struct EnhancedRitualView: View {
 }
 
 #Preview {
-    RealAnimationContainer(source: RealAnimationManager.fireGif) {
+    RealAnimationContainer(source: RealAnimationManager.fireGif, text: "This is a test worry that will be burned away") {
         print("Animation complete")
     }
 }
