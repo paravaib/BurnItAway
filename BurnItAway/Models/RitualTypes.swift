@@ -10,7 +10,7 @@ import SwiftUI
 // MARK: - Ritual Types
 enum RitualType: String, CaseIterable, Identifiable, Hashable {
     case burn = "burn"
-    case shred = "shred"
+    case smoke = "smoke"
     case bury = "bury"
     case wash = "wash"
     
@@ -19,7 +19,7 @@ enum RitualType: String, CaseIterable, Identifiable, Hashable {
     var displayName: String {
         switch self {
         case .burn: return "Burn"
-        case .shred: return "Shred"
+        case .smoke: return "Smoke"
         case .bury: return "Bury"
         case .wash: return "Wash"
         }
@@ -28,7 +28,7 @@ enum RitualType: String, CaseIterable, Identifiable, Hashable {
     var emoji: String {
         switch self {
         case .burn: return "🔥"
-        case .shred: return "🪓"
+        case .smoke: return "💨"
         case .bury: return "🌱"
         case .wash: return "💧"
         }
@@ -37,7 +37,7 @@ enum RitualType: String, CaseIterable, Identifiable, Hashable {
     var description: String {
         switch self {
         case .burn: return "Watch your worries burn away with fire"
-        case .shred: return "Shred your thoughts into pieces"
+        case .smoke: return "See your thoughts dissolve into gentle smoke and float away"
         case .bury: return "Bury your worries in the earth"
         case .wash: return "Wash away your troubles with water"
         }
@@ -46,14 +46,14 @@ enum RitualType: String, CaseIterable, Identifiable, Hashable {
     var isPremium: Bool {
         switch self {
         case .burn: return false
-        case .shred, .bury, .wash: return true
+        case .smoke, .bury, .wash: return true
         }
     }
     
     var color: Color {
         switch self {
         case .burn: return .orange
-        case .shred: return .red
+        case .smoke: return .gray
         case .bury: return .brown
         case .wash: return .blue
         }
@@ -62,7 +62,7 @@ enum RitualType: String, CaseIterable, Identifiable, Hashable {
     var calmColor: Color {
         switch self {
         case .burn: return CalmDesignSystem.Colors.fireOrange
-        case .shred: return Color(red: 0.8, green: 0.3, blue: 0.3) // Soft red
+        case .smoke: return Color(red: 0.6, green: 0.6, blue: 0.6) // Soft gray
         case .bury: return Color(red: 0.6, green: 0.4, blue: 0.2) // Earth brown
         case .wash: return Color(red: 0.3, green: 0.6, blue: 0.8) // Water blue
         }

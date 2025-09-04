@@ -127,8 +127,8 @@ struct RitualAnimationView: View {
             switch ritual {
             case .burn:
                 EnhancedRitualView(ritualType: "burn", text: text, onComplete: onComplete)
-            case .shred:
-                EnhancedRitualView(ritualType: "shred", text: text, onComplete: onComplete)
+            case .smoke:
+                EnhancedRitualView(ritualType: "smoke", text: text, onComplete: onComplete)
             case .bury:
                 EnhancedRitualView(ritualType: "bury", text: text, onComplete: onComplete)
             case .wash:

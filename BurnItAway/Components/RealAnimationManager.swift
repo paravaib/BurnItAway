@@ -41,7 +41,7 @@ class RealAnimationManager: ObservableObject {
     // MARK: - Predefined Animation Sources
     static let fireGif = AnimationSource(type: .gif, fileName: "fire_animation", duration: 3.0)
     static let waterGif = AnimationSource(type: .gif, fileName: "water_wave", duration: 4.0)
-    static let shredGif = AnimationSource(type: .gif, fileName: "paper_shred", duration: 5.0)
+    static let smokeGif = AnimationSource(type: .gif, fileName: "smoke_animation", duration: 5.0)
     static let earthGif = AnimationSource(type: .gif, fileName: "earth_bury", duration: 6.0)
     
     static let fireLottie = AnimationSource(type: .lottie, fileName: "fire_lottie", duration: 8.0)
@@ -49,7 +49,7 @@ class RealAnimationManager: ObservableObject {
     
     // Video backgrounds (you've added these!) - Extended to 15 seconds
     static let fireVideo = AnimationSource(type: .video, fileName: "fire_background", duration: 15.0, loop: true)
-    static let shredVideo = AnimationSource(type: .video, fileName: "shred_background", duration: 15.0, loop: true)
+    static let smokeVideo = AnimationSource(type: .video, fileName: "smoke_background", duration: 15.0, loop: true)
     static let soilVideo = AnimationSource(type: .video, fileName: "soil_background", duration: 15.0, loop: true)
     static let waterVideo = AnimationSource(type: .video, fileName: "water_background", duration: 15.0, loop: true)
     
@@ -432,8 +432,8 @@ struct RealAnimationContainer: View {
         switch source.fileName {
         case "fire_background":
             return "Burning away..."
-        case "shred_background":
-            return "Shredding away..."
+        case "smoke_background":
+            return "Dissolving into smoke..."
         case "soil_background":
             return "Burying in earth..."
         case "water_background":
@@ -447,8 +447,8 @@ struct RealAnimationContainer: View {
         switch source.fileName {
         case "fire_background":
             return "burning"
-        case "shred_background":
-            return "shredding"
+        case "smoke_background":
+            return "smoking"
         case "soil_background":
             return "burying"
         case "water_background":
@@ -489,8 +489,8 @@ struct EnhancedRitualView: View {
         switch ritualType {
         case "burn":
             CalmBurnAnimationView(worryText: text, onComplete: onComplete)
-        case "shred":
-            ShredAnimation(text: text, onComplete: onComplete)
+        case "smoke":
+            SmokeAnimation(text: text, onComplete: onComplete)
         case "bury":
             BuryAnimation(text: text, onComplete: onComplete)
         case "wash":
@@ -518,17 +518,17 @@ struct EnhancedRitualView: View {
             } else {
                 print("❌ No fire animation files found - using fallback")
             }
-        case "shred":
-            if let videoPath = Bundle.main.path(forResource: "shred_background", ofType: "mp4") {
-                print("✅ Found shred video: \(videoPath)")
-                animationSource = RealAnimationManager.shredVideo
+        case "smoke":
+            if let videoPath = Bundle.main.path(forResource: "smoke_background", ofType: "mp4") {
+                print("✅ Found smoke video: \(videoPath)")
+                animationSource = RealAnimationManager.smokeVideo
                 showRealAnimation = true
-            } else if let gifPath = Bundle.main.path(forResource: "paper_shred", ofType: "gif") {
-                print("✅ Found shred GIF: \(gifPath)")
-                animationSource = RealAnimationManager.shredGif
+            } else if let gifPath = Bundle.main.path(forResource: "smoke_animation", ofType: "gif") {
+                print("✅ Found smoke GIF: \(gifPath)")
+                animationSource = RealAnimationManager.smokeGif
                 showRealAnimation = true
             } else {
-                print("❌ No shred animation files found - using fallback")
+                print("❌ No smoke animation files found - using fallback")
             }
         case "bury":
             if let videoPath = Bundle.main.path(forResource: "soil_background", ofType: "mp4") {
