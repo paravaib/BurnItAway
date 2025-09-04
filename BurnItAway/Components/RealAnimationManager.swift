@@ -100,11 +100,14 @@ struct VideoBackgroundView: UIViewRepresentable {
     
     func makeUIView(context: Context) -> UIView {
         let containerView = UIView()
-        containerView.backgroundColor = UIColor.clear
+        containerView.backgroundColor = UIColor.black // Set background color
         
         guard let videoPath = Bundle.main.path(forResource: videoName, ofType: "mp4") else {
+            print("❌ Video file not found: \(videoName).mp4")
             return containerView
         }
+        
+        print("🎥 Creating video player for: \(videoPath)")
         
         let player = AVPlayer(url: URL(fileURLWithPath: videoPath))
         let playerLayer = AVPlayerLayer(player: player)
@@ -114,18 +117,24 @@ struct VideoBackgroundView: UIViewRepresentable {
         
         containerView.layer.addSublayer(playerLayer)
         
+        // Add observer for when video is ready to play
+        player.addObserver(context.coordinator, forKeyPath: "status", options: [.new], context: nil)
+        
         if loop {
             NotificationCenter.default.addObserver(
                 forName: .AVPlayerItemDidPlayToEndTime,
                 object: player.currentItem,
                 queue: .main
             ) { _ in
+                print("🔄 Video ended, looping...")
                 player.seek(to: .zero)
                 player.play()
             }
         }
         
+        // Start playing
         player.play()
+        print("▶️ Video playback started")
         
         return containerView
     }
@@ -133,6 +142,30 @@ struct VideoBackgroundView: UIViewRepresentable {
     func updateUIView(_ uiView: UIView, context: Context) {
         if let playerLayer = uiView.layer.sublayers?.first as? AVPlayerLayer {
             playerLayer.frame = uiView.bounds
+            print("📐 Updated video frame: \(uiView.bounds)")
+        }
+    }
+    
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+    
+    class Coordinator: NSObject {
+        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+            if keyPath == "status" {
+                if let player = object as? AVPlayer {
+                    switch player.status {
+                    case .readyToPlay:
+                        print("✅ Video ready to play")
+                    case .failed:
+                        print("❌ Video failed to load: \(player.error?.localizedDescription ?? "Unknown error")")
+                    case .unknown:
+                        print("⏳ Video status unknown")
+                    @unknown default:
+                        print("❓ Unknown video status")
+                    }
+                }
+            }
         }
     }
 }
@@ -168,14 +201,19 @@ struct RealAnimationContainer: View {
     
     var body: some View {
         ZStack {
+            // Add a background color to see if the container is rendering
+            Color.black.ignoresSafeArea()
+            
             switch source.type {
             case .gif:
+                print("🎬 Rendering GIF: \(source.fileName)")
                 GIFAnimationView(
                     gifName: source.fileName,
                     duration: source.duration ?? 5.0,
                     loop: source.loop
                 )
                 .onAppear {
+                    print("🎬 GIF appeared")
                     if let duration = source.duration {
                         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                             animationComplete = true
@@ -185,11 +223,13 @@ struct RealAnimationContainer: View {
                 }
                 
             case .video:
+                print("🎬 Rendering Video: \(source.fileName)")
                 VideoBackgroundView(
                     videoName: source.fileName,
                     loop: source.loop
                 )
                 .onAppear {
+                    print("🎬 Video appeared")
                     if let duration = source.duration {
                         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                             animationComplete = true
@@ -199,12 +239,14 @@ struct RealAnimationContainer: View {
                 }
                 
             case .lottie:
+                print("🎬 Rendering Lottie: \(source.fileName)")
                 LottieAnimationView(
                     animationName: source.fileName,
                     duration: source.duration ?? 8.0,
                     loop: source.loop
                 )
                 .onAppear {
+                    print("🎬 Lottie appeared")
                     if let duration = source.duration {
                         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                             animationComplete = true
@@ -214,6 +256,7 @@ struct RealAnimationContainer: View {
                 }
                 
             case .spriteKit:
+                print("🎬 Rendering SpriteKit placeholder")
                 // Placeholder for SpriteKit animations
                 VStack {
                     Image(systemName: "gamecontroller")
@@ -228,6 +271,9 @@ struct RealAnimationContainer: View {
             }
         }
         .ignoresSafeArea()
+        .onAppear {
+            print("🎬 RealAnimationContainer appeared with type: \(source.type), file: \(source.fileName)")
+        }
     }
 }
 
@@ -273,44 +319,66 @@ struct EnhancedRitualView: View {
     }
     
     private func loadRealAnimation() {
+        print("🔍 Loading real animation for ritual: \(ritualType)")
+        
         // Check if real animation files exist (prioritize videos over GIFs)
         switch ritualType {
         case "burn":
             // Try video first, then GIF
-            if Bundle.main.path(forResource: "fire_background", ofType: "mp4") != nil {
+            if let videoPath = Bundle.main.path(forResource: "fire_background", ofType: "mp4") {
+                print("✅ Found fire video: \(videoPath)")
                 animationSource = RealAnimationManager.fireVideo
                 showRealAnimation = true
-            } else if Bundle.main.path(forResource: "fire_animation", ofType: "gif") != nil {
+            } else if let gifPath = Bundle.main.path(forResource: "fire_animation", ofType: "gif") {
+                print("✅ Found fire GIF: \(gifPath)")
                 animationSource = RealAnimationManager.fireGif
                 showRealAnimation = true
+            } else {
+                print("❌ No fire animation files found - using fallback")
             }
         case "shred":
-            if Bundle.main.path(forResource: "shred_background", ofType: "mp4") != nil {
+            if let videoPath = Bundle.main.path(forResource: "shred_background", ofType: "mp4") {
+                print("✅ Found shred video: \(videoPath)")
                 animationSource = RealAnimationManager.shredVideo
                 showRealAnimation = true
-            } else if Bundle.main.path(forResource: "paper_shred", ofType: "gif") != nil {
+            } else if let gifPath = Bundle.main.path(forResource: "paper_shred", ofType: "gif") {
+                print("✅ Found shred GIF: \(gifPath)")
                 animationSource = RealAnimationManager.shredGif
                 showRealAnimation = true
+            } else {
+                print("❌ No shred animation files found - using fallback")
             }
         case "bury":
-            if Bundle.main.path(forResource: "soil_background", ofType: "mp4") != nil {
+            if let videoPath = Bundle.main.path(forResource: "soil_background", ofType: "mp4") {
+                print("✅ Found soil video: \(videoPath)")
                 animationSource = RealAnimationManager.soilVideo
                 showRealAnimation = true
-            } else if Bundle.main.path(forResource: "earth_bury", ofType: "gif") != nil {
+            } else if let gifPath = Bundle.main.path(forResource: "earth_bury", ofType: "gif") {
+                print("✅ Found earth GIF: \(gifPath)")
                 animationSource = RealAnimationManager.earthGif
                 showRealAnimation = true
+            } else {
+                print("❌ No bury animation files found - using fallback")
             }
         case "wash":
-            if Bundle.main.path(forResource: "water_background", ofType: "mp4") != nil {
+            if let videoPath = Bundle.main.path(forResource: "water_background", ofType: "mp4") {
+                print("✅ Found water video: \(videoPath)")
                 animationSource = RealAnimationManager.waterVideo
                 showRealAnimation = true
-            } else if Bundle.main.path(forResource: "water_wave", ofType: "gif") != nil {
+            } else if let gifPath = Bundle.main.path(forResource: "water_wave", ofType: "gif") {
+                print("✅ Found water GIF: \(gifPath)")
                 animationSource = RealAnimationManager.waterGif
                 showRealAnimation = true
+            } else {
+                print("❌ No wash animation files found - using fallback")
             }
         default:
+            print("❌ Unknown ritual type: \(ritualType)")
             break
         }
+        
+        print("🎬 Animation source: \(animationSource?.fileName ?? "none")")
+        print("🎬 Show real animation: \(showRealAnimation)")
     }
 }
 
