@@ -8,7 +8,7 @@
 import SwiftUI
 
 // MARK: - Ritual Types
-enum RitualType: String, CaseIterable, Identifiable {
+enum RitualType: String, CaseIterable, Identifiable, Hashable {
     case burn = "burn"
     case shred = "shred"
     case bury = "bury"

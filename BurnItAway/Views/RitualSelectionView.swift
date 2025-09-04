@@ -10,10 +10,7 @@ import SwiftUI
 struct RitualSelectionView: View {
     @EnvironmentObject var premium: PremiumState
     @State private var selectedRitual: RitualType?
-    @State private var showRitualAnimation = false
     @State private var showSubscriptionPaywall = false
-    @State private var worryText = ""
-    @State private var showTextInput = false
     
     var body: some View {
         CalmBackground {
@@ -59,72 +56,11 @@ struct RitualSelectionView: View {
                 .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                 
                 Spacer()
-                
-                // Text Input Section
-                if showTextInput {
-                    VStack(spacing: CalmDesignSystem.Spacing.lg) {
-                        Text("What's on your mind?")
-                            .font(CalmDesignSystem.Typography.headline)
-                            .foregroundColor(CalmDesignSystem.Colors.textPrimary)
-                            .multilineTextAlignment(.center)
-                        
-                        TextField("Type your worry here...", text: $worryText, axis: .vertical)
-                            .font(CalmDesignSystem.Typography.body)
-                            .foregroundColor(CalmDesignSystem.Colors.textPrimary)
-                            .padding(CalmDesignSystem.Spacing.lg)
-                            .background(
-                                RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
-                                    .fill(CalmDesignSystem.Colors.surface)
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
-                                            .stroke(CalmDesignSystem.Colors.glassBorder, lineWidth: 1)
-                                    )
-                            )
-                            .lineLimit(3...6)
-                            .accessibilityLabel("Text input for your worry")
-                            .accessibilityHint("Type the worry or thought you want to release")
-                        
-                        HStack(spacing: CalmDesignSystem.Spacing.lg) {
-                            Button("Cancel") {
-                                withAnimation(.easeInOut(duration: 0.3)) {
-                                    showTextInput = false
-                                    worryText = ""
-                                    selectedRitual = nil
-                                }
-                            }
-                            .buttonStyle(CalmSecondaryButtonStyle())
-                            
-                            Button("Release") {
-                                if !worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-                                    showRitualAnimation = true
-                                }
-                            }
-                            .buttonStyle(CalmPrimaryButtonStyle(color: selectedRitual?.calmColor ?? CalmDesignSystem.Colors.primary))
-                            .disabled(worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-                        }
-                    }
-                    .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
-                }
-                
-                Spacer()
             }
         }
         .navigationBarHidden(false)
-        .fullScreenCover(isPresented: $showRitualAnimation) {
-            if let ritual = selectedRitual {
-                RitualAnimationView(
-                    ritual: ritual,
-                    text: worryText,
-                    onComplete: {
-                        showRitualAnimation = false
-                        showTextInput = false
-                        worryText = ""
-                        selectedRitual = nil
-                    }
-                )
-                .ignoresSafeArea(.all)
-            }
+        .navigationDestination(item: $selectedRitual) { ritual in
+            WorryInputView(ritual: ritual)
         }
         .sheet(isPresented: $showSubscriptionPaywall) {
             SubscriptionPaywallView()
@@ -138,9 +74,6 @@ struct RitualSelectionView: View {
             showSubscriptionPaywall = true
         } else {
             selectedRitual = ritual
-            withAnimation(.easeInOut(duration: 0.3)) {
-                showTextInput = true
-            }
         }
     }
 }
