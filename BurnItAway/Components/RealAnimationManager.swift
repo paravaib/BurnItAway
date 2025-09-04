@@ -206,13 +206,13 @@ struct RealAnimationContainer: View {
             
             switch source.type {
             case .gif:
-                print("🎬 Rendering GIF: \(source.fileName)")
                 GIFAnimationView(
                     gifName: source.fileName,
                     duration: source.duration ?? 5.0,
                     loop: source.loop
                 )
                 .onAppear {
+                    print("🎬 Rendering GIF: \(source.fileName)")
                     print("🎬 GIF appeared")
                     if let duration = source.duration {
                         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
@@ -223,12 +223,12 @@ struct RealAnimationContainer: View {
                 }
                 
             case .video:
-                print("🎬 Rendering Video: \(source.fileName)")
                 VideoBackgroundView(
                     videoName: source.fileName,
                     loop: source.loop
                 )
                 .onAppear {
+                    print("🎬 Rendering Video: \(source.fileName)")
                     print("🎬 Video appeared")
                     if let duration = source.duration {
                         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
@@ -239,13 +239,13 @@ struct RealAnimationContainer: View {
                 }
                 
             case .lottie:
-                print("🎬 Rendering Lottie: \(source.fileName)")
                 LottieAnimationView(
                     animationName: source.fileName,
                     duration: source.duration ?? 8.0,
                     loop: source.loop
                 )
                 .onAppear {
+                    print("🎬 Rendering Lottie: \(source.fileName)")
                     print("🎬 Lottie appeared")
                     if let duration = source.duration {
                         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
@@ -256,7 +256,6 @@ struct RealAnimationContainer: View {
                 }
                 
             case .spriteKit:
-                print("🎬 Rendering SpriteKit placeholder")
                 // Placeholder for SpriteKit animations
                 VStack {
                     Image(systemName: "gamecontroller")
@@ -268,6 +267,9 @@ struct RealAnimationContainer: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.clear)
+                .onAppear {
+                    print("🎬 Rendering SpriteKit placeholder")
+                }
             }
         }
         .ignoresSafeArea()
