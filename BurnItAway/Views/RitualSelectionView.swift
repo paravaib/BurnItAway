@@ -13,57 +13,61 @@ struct RitualSelectionView: View {
     @State private var showSubscriptionPaywall = false
     
     var body: some View {
-        CalmBackground {
-            VStack(spacing: CalmDesignSystem.Spacing.xxl) {
-                // Header
-                VStack(spacing: CalmDesignSystem.Spacing.lg) {
-                    Text("Choose Your Ritual")
-                        .font(CalmDesignSystem.Typography.largeTitle)
-                        .foregroundColor(CalmDesignSystem.Colors.textPrimary)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.8)
-                        .allowsTightening(true)
-                        .multilineTextAlignment(.center)
-                    
-                    Text("Select how you'd like to symbolically release your worry")
-                        .font(CalmDesignSystem.Typography.subheadline)
-                        .foregroundColor(CalmDesignSystem.Colors.textSecondary)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(3)
-                        .minimumScaleFactor(0.7)
-                        .allowsTightening(true)
-                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                }
-                .padding(.top, CalmDesignSystem.Spacing.xxxl)
-                
-                Spacer()
-                
-                // Ritual Grid
-                LazyVGrid(columns: [
-                    GridItem(.flexible()),
-                    GridItem(.flexible())
-                ], spacing: CalmDesignSystem.Spacing.lg) {
-                    ForEach(RitualType.allCases) { ritual in
-                        RitualCard(
-                            ritual: ritual,
-                            isPremium: premium.isPremium,
-                            onTap: {
-                                handleRitualSelection(ritual)
-                            }
-                        )
+        if #available(iOS 17.0, *) {
+            CalmBackground {
+                VStack(spacing: CalmDesignSystem.Spacing.xxl) {
+                    // Header
+                    VStack(spacing: CalmDesignSystem.Spacing.lg) {
+                        Text("Choose Your Ritual")
+                            .font(CalmDesignSystem.Typography.largeTitle)
+                            .foregroundColor(CalmDesignSystem.Colors.textPrimary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
+                            .allowsTightening(true)
+                            .multilineTextAlignment(.center)
+                        
+                        Text("Select how you'd like to symbolically release your worry")
+                            .font(CalmDesignSystem.Typography.subheadline)
+                            .foregroundColor(CalmDesignSystem.Colors.textSecondary)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(3)
+                            .minimumScaleFactor(0.7)
+                            .allowsTightening(true)
+                            .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                     }
+                    .padding(.top, CalmDesignSystem.Spacing.xxxl)
+                    
+                    Spacer()
+                    
+                    // Ritual Grid
+                    LazyVGrid(columns: [
+                        GridItem(.flexible()),
+                        GridItem(.flexible())
+                    ], spacing: CalmDesignSystem.Spacing.lg) {
+                        ForEach(RitualType.allCases) { ritual in
+                            RitualCard(
+                                ritual: ritual,
+                                isPremium: premium.isPremium,
+                                onTap: {
+                                    handleRitualSelection(ritual)
+                                }
+                            )
+                        }
+                    }
+                    .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                    
+                    Spacer()
                 }
-                .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                
-                Spacer()
             }
-        }
-        .navigationBarHidden(false)
-        .navigationDestination(item: $selectedRitual) { ritual in
-            WorryInputView(ritual: ritual)
-        }
-        .sheet(isPresented: $showSubscriptionPaywall) {
-            SubscriptionPaywallView()
+            .navigationBarHidden(false)
+            .navigationDestination(item: $selectedRitual) { ritual in
+                WorryInputView(ritual: ritual)
+            }
+            .sheet(isPresented: $showSubscriptionPaywall) {
+                SubscriptionPaywallView()
+            }
+        } else {
+            // Fallback on earlier versions
         }
     }
     
