@@ -234,7 +234,7 @@ struct RitualAnimationView: View {
         Group {
             switch ritual {
             case .burn:
-                CalmBurnAnimationView(text: text, onComplete: onComplete)
+                CalmBurnAnimationView(worryText: text, onComplete: onComplete)
             case .shred:
                 ShredAnimation(text: text, onComplete: onComplete)
             case .bury:
