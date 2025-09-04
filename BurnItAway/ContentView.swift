@@ -10,6 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var premium: PremiumState
+    @StateObject private var wellnessProgress = WellnessProgress()
     @State private var showBreathingIndicator = false
     @State private var showSubscriptionPaywall = false
     
@@ -145,7 +146,7 @@ struct ContentView: View {
                     
                     Spacer()
                     
-                    // Help and Settings buttons
+                    // Help, Progress, and Settings buttons
                     HStack(spacing: CalmDesignSystem.Spacing.lg) {
                         // Help button
                         NavigationLink {
@@ -162,6 +163,34 @@ struct ContentView: View {
                         }
                         .accessibilityLabel("Help and information about the app")
                         .accessibilityHint("Learn about how to use BurnItAway and the psychology behind it")
+                        
+                        Spacer()
+                        
+                        // Progress Dashboard button
+                        NavigationLink {
+                            ProgressDashboardView()
+                        } label: {
+                            ZStack {
+                                Image(systemName: "chart.line.uptrend.xyaxis")
+                                    .font(.system(size: 16, weight: .medium))
+                                    .foregroundColor(CalmDesignSystem.Colors.textSecondary)
+                                
+                                // Streak indicator
+                                if wellnessProgress.currentStreak > 0 {
+                                    Circle()
+                                        .fill(Color.orange)
+                                        .frame(width: 8, height: 8)
+                                        .offset(x: 12, y: -12)
+                                }
+                            }
+                            .padding(CalmDesignSystem.Spacing.md)
+                            .background(
+                                Circle()
+                                    .fill(CalmDesignSystem.Colors.surface.opacity(0.5))
+                            )
+                        }
+                        .accessibilityLabel("View your progress and achievements")
+                        .accessibilityHint("See your wellness journey, streaks, and achievements")
                         
                         Spacer()
                         
@@ -187,6 +216,9 @@ struct ContentView: View {
             }
             .navigationBarHidden(true)
             .onAppear {
+                // Load wellness progress
+                wellnessProgress.loadProgress()
+                
                 // Start breathing indicator after a brief delay
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation(CalmDesignSystem.Animations.gentle) {

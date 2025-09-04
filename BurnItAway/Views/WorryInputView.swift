@@ -11,6 +11,8 @@ struct WorryInputView: View {
     let ritual: RitualType
     @State private var worryText = ""
     @State private var showRitualAnimation = false
+    @State private var showingCelebration = false
+    @StateObject private var wellnessProgress = WellnessProgress()
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -117,26 +119,52 @@ struct WorryInputView: View {
 }
 
 // Helper view to wrap different ritual animations
-struct RitualAnimationView: View {
-    let ritual: RitualType
-    let text: String
-    let onComplete: () -> Void
-    
-    var body: some View {
-        Group {
-            switch ritual {
-            case .burn:
-                EnhancedRitualView(ritualType: "burn", text: text, onComplete: onComplete)
-            case .smoke:
-                EnhancedRitualView(ritualType: "smoke", text: text, onComplete: onComplete)
-                                case .space:
-                        EnhancedRitualView(ritualType: "space", text: text, onComplete: onComplete)
-            case .wash:
-                EnhancedRitualView(ritualType: "wash", text: text, onComplete: onComplete)
+    struct RitualAnimationView: View {
+        let ritual: RitualType
+        let text: String
+        let onComplete: () -> Void
+        @StateObject private var wellnessProgress = WellnessProgress()
+        @State private var showingCelebration = false
+        
+        var body: some View {
+            Group {
+                if showingCelebration {
+                    RitualCelebrationView(
+                        feedback: RitualCompletionFeedback.generateFeedback(for: wellnessProgress, ritual: ritual),
+                        progress: wellnessProgress,
+                        onContinue: {
+                            wellnessProgress.completeRitual(ritual)
+                            onComplete()
+                        }
+                    )
+                } else {
+                    Group {
+                        switch ritual {
+                        case .burn:
+                            EnhancedRitualView(ritualType: "burn", text: text, onComplete: {
+                                showingCelebration = true
+                            })
+                        case .smoke:
+                            EnhancedRitualView(ritualType: "smoke", text: text, onComplete: {
+                                showingCelebration = true
+                            })
+                        case .space:
+                            EnhancedRitualView(ritualType: "space", text: text, onComplete: {
+                                showingCelebration = true
+                            })
+                        case .wash:
+                            EnhancedRitualView(ritualType: "wash", text: text, onComplete: {
+                                showingCelebration = true
+                            })
+                        }
+                    }
+                }
+            }
+            .onAppear {
+                wellnessProgress.loadProgress()
             }
         }
     }
-}
 
 #Preview {
     NavigationStack {
