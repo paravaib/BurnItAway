@@ -109,8 +109,14 @@ struct WorryInputView: View {
                 ritual: ritual,
                 text: worryText,
                 onComplete: {
-                    showRitualAnimation = false
-                    dismiss()
+                    // Add a small delay for smooth transition
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        showRitualAnimation = false
+                        // Add another small delay before dismissing
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                            dismiss()
+                        }
+                    }
                 }
             )
             .ignoresSafeArea(.all)
@@ -127,7 +133,40 @@ struct WorryInputView: View {
         @State private var showingCelebration = false
         
         var body: some View {
-            Group {
+            ZStack {
+                // Ritual Animation (background)
+                Group {
+                    switch ritual {
+                    case .burn:
+                        EnhancedRitualView(ritualType: "burn", text: text, onComplete: {
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                showingCelebration = true
+                            }
+                        })
+                    case .smoke:
+                        EnhancedRitualView(ritualType: "smoke", text: text, onComplete: {
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                showingCelebration = true
+                            }
+                        })
+                    case .space:
+                        EnhancedRitualView(ritualType: "space", text: text, onComplete: {
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                showingCelebration = true
+                            }
+                        })
+                    case .wash:
+                        EnhancedRitualView(ritualType: "wash", text: text, onComplete: {
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                showingCelebration = true
+                            }
+                        })
+                    }
+                }
+                .opacity(showingCelebration ? 0.0 : 1.0)
+                .animation(.easeInOut(duration: 0.5), value: showingCelebration)
+                
+                // Celebration View (overlay)
                 if showingCelebration {
                     RitualCelebrationView(
                         feedback: RitualCompletionFeedback.generateFeedback(for: wellnessProgress, ritual: ritual),
@@ -137,27 +176,8 @@ struct WorryInputView: View {
                             onComplete()
                         }
                     )
-                } else {
-                    Group {
-                        switch ritual {
-                        case .burn:
-                            EnhancedRitualView(ritualType: "burn", text: text, onComplete: {
-                                showingCelebration = true
-                            })
-                        case .smoke:
-                            EnhancedRitualView(ritualType: "smoke", text: text, onComplete: {
-                                showingCelebration = true
-                            })
-                        case .space:
-                            EnhancedRitualView(ritualType: "space", text: text, onComplete: {
-                                showingCelebration = true
-                            })
-                        case .wash:
-                            EnhancedRitualView(ritualType: "wash", text: text, onComplete: {
-                                showingCelebration = true
-                            })
-                        }
-                    }
+                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                    .animation(.easeInOut(duration: 0.5), value: showingCelebration)
                 }
             }
             .onAppear {

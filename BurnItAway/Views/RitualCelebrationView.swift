@@ -101,8 +101,14 @@ struct RitualCelebrationView: View {
                 
                 // Continue button
                 Button("Continue") {
-                    feedback.hapticPattern.play()
-                    onContinue()
+                    // Enhanced haptic feedback for smooth transition
+                    let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
+                    impactFeedback.impactOccurred()
+                    
+                    // Small delay for haptic feedback to complete
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        onContinue()
+                    }
                 }
                 .buttonStyle(CalmPrimaryButtonStyle(color: feedback.color))
                 .opacity(showCelebration ? 1.0 : 0.0)
