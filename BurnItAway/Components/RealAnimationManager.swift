@@ -398,12 +398,12 @@ struct RealAnimationContainer: View {
                         // Main text
                         Text(text)
                             .font(CalmDesignSystem.Typography.largeTitle)
-                            .foregroundColor(.white)
+                            .foregroundColor(getTextColor())
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                             .background(
                                 RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color.black.opacity(0.3))
+                                    .fill(getBackgroundColor())
                                     .overlay(
                                         RoundedRectangle(cornerRadius: 12)
                                             .stroke(getGlowColor().opacity(0.8), lineWidth: 2)
@@ -503,31 +503,31 @@ struct RealAnimationContainer: View {
                 textRotation = Double.random(in: -10...10)
             }
             
-            // Create glowing particles
-            createGlowingParticles()
+            // Create light particles
+            createLightParticles()
             showTextParticles = true
         }
         
-        // Phase 4: Start dissolving (7-9 seconds)
+        // Phase 4: Light transformation (7-9 seconds)
         DispatchQueue.main.asyncAfter(deadline: .now() + 7.0) {
-            explosionPhase = .dissolving
+            explosionPhase = .lightTransformation
             withAnimation(.easeInOut(duration: 2.0)) {
-                textOpacity = 0.3
-                textScale = 0.8
-                glowIntensity = 0.4
-                glowRadius = 20.0
+                textOpacity = 0.8 // Keep text visible but lighter
+                textScale = 1.0 // Return to normal size
+                glowIntensity = 0.9 // Maintain strong glow
+                glowRadius = 25.0 // Expand glow
             }
         }
         
-        // Phase 5: Final vanishing (9-11 seconds)
+        // Phase 5: Ethereal light (9+ seconds) - PERMANENT
         DispatchQueue.main.asyncAfter(deadline: .now() + 9.0) {
-            explosionPhase = .vanished
+            explosionPhase = .etherealLight
             withAnimation(.easeInOut(duration: 2.0)) {
-                textOpacity = 0.0
-                textScale = 0.1
-                glowIntensity = 0.0
-                glowRadius = 0.0
-                textShimmer = 0.0
+                textOpacity = 0.6 // Keep text visible as ethereal light
+                textScale = 1.0 // Normal size
+                glowIntensity = 0.7 // Maintain beautiful glow
+                glowRadius = 20.0 // Steady glow radius
+                textShimmer = 0.8 // Gentle shimmer continues
             }
         }
     }
@@ -583,6 +583,38 @@ struct RealAnimationContainer: View {
         }
     }
     
+    private func createLightParticles() {
+        let particleCount = 15 // Light particles
+        textParticles = (0..<particleCount).map { _ in
+            TextParticle(
+                id: UUID(),
+                x: CGFloat.random(in: -100...100),
+                y: CGFloat.random(in: -50...50),
+                size: CGFloat.random(in: 3...8),
+                opacity: 0.8,
+                velocity: getLightVelocity(),
+                rotation: Double.random(in: 0...360),
+                rotationSpeed: Double.random(in: -5...5),
+                scale: CGFloat.random(in: 0.8...1.5)
+            )
+        }
+    }
+    
+    private func getLightVelocity() -> CGPoint {
+        switch getRitualType() {
+        case "fire":
+            return CGPoint(x: CGFloat.random(in: -0.5...0.5), y: CGFloat.random(in: -1...(-0.2)))
+        case "smoke":
+            return CGPoint(x: CGFloat.random(in: -0.3...0.3), y: CGFloat.random(in: -0.8...(-0.1)))
+        case "bury":
+            return CGPoint(x: CGFloat.random(in: -0.3...0.3), y: CGFloat.random(in: 0.2...1))
+        case "wash":
+            return CGPoint(x: CGFloat.random(in: -0.5...0.5), y: CGFloat.random(in: 0.2...1))
+        default:
+            return CGPoint(x: CGFloat.random(in: -0.3...0.3), y: CGFloat.random(in: -0.5...0.5))
+        }
+    }
+    
     private func getGlowingVelocity() -> CGPoint {
         switch getRitualType() {
         case "fire":
@@ -613,6 +645,36 @@ struct RealAnimationContainer: View {
         }
     }
     
+    private func getTextColor() -> Color {
+        switch explosionPhase {
+        case .normal:
+            return .white
+        case .glowing:
+            return .white
+        case .brightGlow:
+            return .white
+        case .lightTransformation:
+            return getGlowColor().opacity(0.9)
+        case .etherealLight:
+            return getGlowColor().opacity(0.8)
+        }
+    }
+    
+    private func getBackgroundColor() -> Color {
+        switch explosionPhase {
+        case .normal:
+            return Color.black.opacity(0.3)
+        case .glowing:
+            return Color.black.opacity(0.2)
+        case .brightGlow:
+            return Color.black.opacity(0.1)
+        case .lightTransformation:
+            return getGlowColor().opacity(0.1)
+        case .etherealLight:
+            return getGlowColor().opacity(0.05)
+        }
+    }
+    
     private func getExplosionVelocity() -> CGPoint {
         let angle = Double.random(in: 0...2 * .pi)
         let speed = CGFloat.random(in: 2...6)
@@ -630,9 +692,9 @@ struct RealAnimationContainer: View {
             return textScale
         case .brightGlow:
             return textScale
-        case .dissolving:
+        case .lightTransformation:
             return textScale
-        case .vanished:
+        case .etherealLight:
             return textScale
         }
     }
@@ -645,10 +707,10 @@ struct RealAnimationContainer: View {
             return 1.0
         case .brightGlow:
             return 2.0
-        case .dissolving:
-            return 3.0
-        case .vanished:
-            return 5.0
+        case .lightTransformation:
+            return 1.5
+        case .etherealLight:
+            return 1.0
         }
     }
     
@@ -886,13 +948,13 @@ struct EnhancedRitualView: View {
     }
 }
 
-// MARK: - Explosion Phase Enum
+// MARK: - Light Transformation Phase Enum
 enum ExplosionPhase {
     case normal
     case glowing
     case brightGlow
-    case dissolving
-    case vanished
+    case lightTransformation
+    case etherealLight
 }
 
 // MARK: - Text Particle Model
