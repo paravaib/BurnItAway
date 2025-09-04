@@ -55,11 +55,11 @@ struct ContentView: View {
                             // Subtle floating particles around the button
                             FloatingParticles()
                             
-                            NavigationLink("Burn Your Thought") { EnhancedBurnView() }
+                            NavigationLink("Release Your Worry") { RitualSelectionView() }
                                 .buttonStyle(CalmPrimaryButtonStyle())
                                 .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                                .accessibilityLabel("Burn your worry")
-                                .accessibilityHint("Double tap to write down your worry and watch it burn away")
+                                .accessibilityLabel("Release your worry")
+                                .accessibilityHint("Double tap to choose how to symbolically release your worry")
                                 .accessibilityAddTraits(.isButton)
                         }
                         
