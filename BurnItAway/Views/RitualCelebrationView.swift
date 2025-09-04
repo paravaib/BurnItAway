@@ -55,18 +55,20 @@ struct RitualCelebrationView: View {
                 if showProgress {
                     VStack(spacing: 15) {
                         HStack(spacing: 30) {
-                            StatCard(
+                            CelebrationStatCard(
                                 title: "Streak",
                                 value: "\(progress.currentStreak)",
                                 subtitle: "days",
-                                color: .orange
+                                color: .orange,
+                                icon: "flame.fill"
                             )
                             
-                            StatCard(
+                            CelebrationStatCard(
                                 title: "Total",
                                 value: "\(progress.totalWorriesReleased)",
                                 subtitle: "released",
-                                color: .blue
+                                color: .blue,
+                                icon: "heart.fill"
                             )
                         }
                         
@@ -88,7 +90,7 @@ struct RitualCelebrationView: View {
                             .foregroundColor(.yellow)
                         
                         ForEach(progress.achievements.suffix(1)) { achievement in
-                            AchievementCard(achievement: achievement)
+                            CelebrationAchievementCard(achievement: achievement)
                         }
                     }
                     .opacity(showAchievements ? 1.0 : 0.0)
@@ -168,12 +170,13 @@ struct RitualCelebrationView: View {
     }
 }
 
-// MARK: - Stat Card
-struct StatCard: View {
+// MARK: - Celebration Stat Card (simplified version for celebrations)
+struct CelebrationStatCard: View {
     let title: String
     let value: String
     let subtitle: String
     let color: Color
+    let icon: String
     
     var body: some View {
         VStack(spacing: 5) {
@@ -202,8 +205,8 @@ struct StatCard: View {
     }
 }
 
-// MARK: - Achievement Card
-struct AchievementCard: View {
+// MARK: - Celebration Achievement Card (simplified version for celebrations)
+struct CelebrationAchievementCard: View {
     let achievement: Achievement
     
     var body: some View {
