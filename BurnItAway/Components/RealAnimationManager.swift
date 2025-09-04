@@ -98,37 +98,95 @@ struct VideoBackgroundView: UIViewRepresentable {
     let videoName: String
     let loop: Bool
     
-    func makeUIView(context: Context) -> UIView {
-        let containerView = UIView()
-        containerView.backgroundColor = UIColor.black // Set background color
+    func makeUIView(context: Context) -> VideoPlayerView {
+        let videoView = VideoPlayerView()
+        videoView.setupVideo(name: videoName, loop: loop)
+        return videoView
+    }
+    
+    func updateUIView(_ uiView: VideoPlayerView, context: Context) {
+        // Update frame when view changes
+        uiView.updateFrame()
+    }
+}
+
+// MARK: - Custom Video Player View
+class VideoPlayerView: UIView {
+    private var player: AVPlayer?
+    private var playerLayer: AVPlayerLayer?
+    private var loopObserver: NSObjectProtocol?
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        backgroundColor = UIColor.black
+    }
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        backgroundColor = UIColor.black
+    }
+    
+    func setupVideo(name: String, loop: Bool) {
+        print("🎥 Setting up video: \(name)")
         
-        guard let videoPath = Bundle.main.path(forResource: videoName, ofType: "mp4") else {
-            print("❌ Video file not found: \(videoName).mp4")
-            return containerView
+        guard let videoPath = Bundle.main.path(forResource: name, ofType: "mp4") else {
+            print("❌ Video file not found: \(name).mp4")
+            showFallbackMessage()
+            return
         }
         
-        print("🎥 Creating video player for: \(videoPath)")
+        print("✅ Video file found: \(videoPath)")
         
-        let player = AVPlayer(url: URL(fileURLWithPath: videoPath))
-        let playerLayer = AVPlayerLayer(player: player)
+        // Check file size
+        do {
+            let attributes = try FileManager.default.attributesOfItem(atPath: videoPath)
+            if let fileSize = attributes[.size] as? NSNumber {
+                let sizeInMB = fileSize.doubleValue / (1024 * 1024)
+                print("📊 Video file size: \(String(format: "%.1f", sizeInMB)) MB")
+            }
+        } catch {
+            print("⚠️ Could not get file size: \(error)")
+        }
         
+        // Create player
+        let url = URL(fileURLWithPath: videoPath)
+        player = AVPlayer(url: url)
+        
+        guard let player = player else {
+            print("❌ Failed to create player")
+            showFallbackMessage()
+            return
+        }
+        
+        // Create player layer
+        playerLayer = AVPlayerLayer(player: player)
+        guard let playerLayer = playerLayer else {
+            print("❌ Failed to create player layer")
+            showFallbackMessage()
+            return
+        }
+        
+        // Configure player layer
         playerLayer.videoGravity = .resizeAspectFill
-        playerLayer.frame = containerView.bounds
+        playerLayer.frame = bounds
+        layer.addSublayer(playerLayer)
         
-        containerView.layer.addSublayer(playerLayer)
+        print("📐 Player layer frame: \(bounds)")
+        print("📐 Player layer added to view layer")
         
-        // Add observer for when video is ready to play
-        player.addObserver(context.coordinator, forKeyPath: "status", options: [.new], context: nil)
+        // Add status observer
+        player.addObserver(self, forKeyPath: "status", options: [.new], context: nil)
         
+        // Setup looping
         if loop {
-            NotificationCenter.default.addObserver(
+            loopObserver = NotificationCenter.default.addObserver(
                 forName: .AVPlayerItemDidPlayToEndTime,
                 object: player.currentItem,
                 queue: .main
-            ) { _ in
+            ) { [weak self] _ in
                 print("🔄 Video ended, looping...")
-                player.seek(to: .zero)
-                player.play()
+                self?.player?.seek(to: .zero)
+                self?.player?.play()
             }
         }
         
@@ -136,36 +194,64 @@ struct VideoBackgroundView: UIViewRepresentable {
         player.play()
         print("▶️ Video playback started")
         
-        return containerView
-    }
-    
-    func updateUIView(_ uiView: UIView, context: Context) {
-        if let playerLayer = uiView.layer.sublayers?.first as? AVPlayerLayer {
-            playerLayer.frame = uiView.bounds
-            print("📐 Updated video frame: \(uiView.bounds)")
+        // Add a small delay to check if video is actually playing
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            if player.rate == 0 {
+                print("⚠️ Video is not playing (rate: \(player.rate))")
+            } else {
+                print("✅ Video is playing (rate: \(player.rate))")
+            }
         }
     }
     
-    func makeCoordinator() -> Coordinator {
-        Coordinator()
+    private func showFallbackMessage() {
+        // Add a label to show that video failed to load
+        let label = UILabel()
+        label.text = "Video not available\nUsing fallback animation"
+        label.textColor = .white
+        label.textAlignment = .center
+        label.numberOfLines = 0
+        label.font = UIFont.systemFont(ofSize: 16)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        addSubview(label)
+        NSLayoutConstraint.activate([
+            label.centerXAnchor.constraint(equalTo: centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: centerYAnchor)
+        ])
     }
     
-    class Coordinator: NSObject {
-        override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-            if keyPath == "status" {
-                if let player = object as? AVPlayer {
-                    switch player.status {
-                    case .readyToPlay:
-                        print("✅ Video ready to play")
-                    case .failed:
-                        print("❌ Video failed to load: \(player.error?.localizedDescription ?? "Unknown error")")
-                    case .unknown:
-                        print("⏳ Video status unknown")
-                    @unknown default:
-                        print("❓ Unknown video status")
-                    }
+    func updateFrame() {
+        playerLayer?.frame = bounds
+        print("📐 Updated player layer frame: \(bounds)")
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        playerLayer?.frame = bounds
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "status" {
+            if let player = object as? AVPlayer {
+                switch player.status {
+                case .readyToPlay:
+                    print("✅ Video ready to play")
+                case .failed:
+                    print("❌ Video failed to load: \(player.error?.localizedDescription ?? "Unknown error")")
+                case .unknown:
+                    print("⏳ Video status unknown")
+                @unknown default:
+                    print("❓ Unknown video status")
                 }
             }
+        }
+    }
+    
+    deinit {
+        player?.removeObserver(self, forKeyPath: "status")
+        if let observer = loopObserver {
+            NotificationCenter.default.removeObserver(observer)
         }
     }
 }
