@@ -161,27 +161,6 @@ struct RitualCard: View {
     }
 }
 
-// MARK: - Ritual Animation View
-struct RitualAnimationView: View {
-    let ritual: RitualType
-    let text: String
-    let onComplete: () -> Void
-    
-    var body: some View {
-        Group {
-            switch ritual {
-            case .burn:
-                CalmBurnAnimationView(worryText: text, onComplete: onComplete)
-            case .shred:
-                ShredAnimation(text: text, onComplete: onComplete)
-            case .bury:
-                BuryAnimation(text: text, onComplete: onComplete)
-            case .wash:
-                WashAnimation(text: text, onComplete: onComplete)
-            }
-        }
-    }
-}
 
 #Preview {
     NavigationStack {

@@ -116,6 +116,28 @@ struct WorryInputView: View {
     }
 }
 
+// Helper view to wrap different ritual animations
+struct RitualAnimationView: View {
+    let ritual: RitualType
+    let text: String
+    let onComplete: () -> Void
+    
+    var body: some View {
+        Group {
+            switch ritual {
+            case .burn:
+                EnhancedRitualView(ritualType: "burn", text: text, onComplete: onComplete)
+            case .shred:
+                EnhancedRitualView(ritualType: "shred", text: text, onComplete: onComplete)
+            case .bury:
+                EnhancedRitualView(ritualType: "bury", text: text, onComplete: onComplete)
+            case .wash:
+                EnhancedRitualView(ritualType: "wash", text: text, onComplete: onComplete)
+            }
+        }
+    }
+}
+
 #Preview {
     NavigationStack {
         WorryInputView(ritual: .burn)
