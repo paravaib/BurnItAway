@@ -40,7 +40,6 @@ class PhotoBurnAnimationController: ObservableObject {
         let easedProgress = easeInOutCubic(progress)
         
         burnProgress = easedProgress
-        fireIntensity = min(easedProgress * 1.5, 1.0)
         
         // Smooth image fade - starts fading earlier as flames grow
         // Start fading at 30% progress, more gradual fade
