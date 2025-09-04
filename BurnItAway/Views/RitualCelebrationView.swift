@@ -99,7 +99,7 @@ struct RitualCelebrationView: View {
                 
                 Spacer()
                 
-                // Continue button
+                // Continue button - centered
                 Button("Continue") {
                     // Enhanced haptic feedback for smooth transition
                     let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
@@ -113,6 +113,8 @@ struct RitualCelebrationView: View {
                 .buttonStyle(CalmPrimaryButtonStyle(color: feedback.color))
                 .opacity(showCelebration ? 1.0 : 0.0)
                 .animation(.easeInOut(duration: 1.0).delay(2.0), value: showCelebration)
+                
+                Spacer()
             }
             .padding(.horizontal, 32)
         }
