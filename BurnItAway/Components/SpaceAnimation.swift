@@ -183,7 +183,7 @@ struct SpaceAnimation: View {
             
             // Fade out as they drift
             if abs(spaceParticles[i].x) > 300 || abs(spaceParticles[i].y) > 300 {
-                spaceParticles[i].opacity = max(0, 1.0 - (abs(spaceParticles[i].x) + abs(spaceParticles[i].y)) / 600)
+                spaceParticles[i].opacity = max(0.0, 1.0 - Double(abs(spaceParticles[i].x) + abs(spaceParticles[i].y)) / 600.0)
             }
         }
         
@@ -223,7 +223,7 @@ struct CosmicParticleView: View {
                     ],
                     center: .center,
                     startRadius: 0,
-                    endRadius: particle.size / 2
+                    endRadius: particle.size / 2.0
                 )
             )
             .frame(width: particle.size * particle.scale, height: particle.size * particle.scale)
