@@ -27,6 +27,11 @@ struct CalmDesignSystem {
         static let fireRed = Color(red: 0.9, green: 0.3, blue: 0.1) // Deep red
         static let fireDark = Color(red: 0.3, green: 0.1, blue: 0.05) // Dark ember
         
+        // Space colors - cosmic purple palette
+        static let spacePurple = Color(red: 0.5, green: 0.3, blue: 0.8) // Cosmic purple
+        static let spaceBlue = Color(red: 0.3, green: 0.5, blue: 0.9) // Deep space blue
+        static let spaceIndigo = Color(red: 0.4, green: 0.2, blue: 0.7) // Space indigo
+        
         // Status colors
         static let success = Color(red: 0.2, green: 0.8, blue: 0.4) // Success green
         static let warning = Color(red: 1.0, green: 0.7, blue: 0.2) // Warning orange

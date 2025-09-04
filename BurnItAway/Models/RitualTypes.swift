@@ -11,7 +11,7 @@ import SwiftUI
 enum RitualType: String, CaseIterable, Identifiable, Hashable {
     case burn = "burn"
     case smoke = "smoke"
-    case bury = "bury"
+    case space = "space"
     case wash = "wash"
     
     var id: String { rawValue }
@@ -20,7 +20,7 @@ enum RitualType: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .burn: return "Burn"
         case .smoke: return "Smoke"
-        case .bury: return "Bury"
+        case .space: return "Space"
         case .wash: return "Wash"
         }
     }
@@ -29,7 +29,7 @@ enum RitualType: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .burn: return "🔥"
         case .smoke: return "💨"
-        case .bury: return "🌱"
+        case .space: return "🌌"
         case .wash: return "💧"
         }
     }
@@ -38,7 +38,7 @@ enum RitualType: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .burn: return "Watch your worries burn away with fire"
         case .smoke: return "See your thoughts dissolve into gentle smoke and float away"
-        case .bury: return "Bury your worries in the earth"
+        case .space: return "Release your worries into the infinite cosmos"
         case .wash: return "Wash away your troubles with water"
         }
     }
@@ -46,7 +46,7 @@ enum RitualType: String, CaseIterable, Identifiable, Hashable {
     var isPremium: Bool {
         switch self {
         case .burn: return false
-        case .smoke, .bury, .wash: return true
+        case .smoke, .space, .wash: return true
         }
     }
     
@@ -54,7 +54,7 @@ enum RitualType: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .burn: return .orange
         case .smoke: return .gray
-        case .bury: return .brown
+        case .space: return .purple
         case .wash: return .blue
         }
     }
@@ -63,7 +63,7 @@ enum RitualType: String, CaseIterable, Identifiable, Hashable {
         switch self {
         case .burn: return CalmDesignSystem.Colors.fireOrange
         case .smoke: return Color(red: 0.6, green: 0.6, blue: 0.6) // Soft gray
-        case .bury: return Color(red: 0.6, green: 0.4, blue: 0.2) // Earth brown
+        case .space: return Color(red: 0.5, green: 0.3, blue: 0.8) // Cosmic purple
         case .wash: return Color(red: 0.3, green: 0.6, blue: 0.8) // Water blue
         }
     }

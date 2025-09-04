@@ -129,8 +129,8 @@ struct RitualAnimationView: View {
                 EnhancedRitualView(ritualType: "burn", text: text, onComplete: onComplete)
             case .smoke:
                 EnhancedRitualView(ritualType: "smoke", text: text, onComplete: onComplete)
-            case .bury:
-                EnhancedRitualView(ritualType: "bury", text: text, onComplete: onComplete)
+                                case .space:
+                        EnhancedRitualView(ritualType: "space", text: text, onComplete: onComplete)
             case .wash:
                 EnhancedRitualView(ritualType: "wash", text: text, onComplete: onComplete)
             }

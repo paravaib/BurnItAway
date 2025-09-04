@@ -42,7 +42,7 @@ class RealAnimationManager: ObservableObject {
     static let fireGif = AnimationSource(type: .gif, fileName: "fire_animation", duration: 3.0)
     static let waterGif = AnimationSource(type: .gif, fileName: "water_wave", duration: 4.0)
     static let smokeGif = AnimationSource(type: .gif, fileName: "smoke_animation", duration: 5.0)
-    static let earthGif = AnimationSource(type: .gif, fileName: "earth_bury", duration: 6.0)
+    static let spaceGif = AnimationSource(type: .gif, fileName: "space_animation", duration: 6.0)
     
     static let fireLottie = AnimationSource(type: .lottie, fileName: "fire_lottie", duration: 8.0)
     static let waterLottie = AnimationSource(type: .lottie, fileName: "water_lottie", duration: 10.0)
@@ -50,7 +50,7 @@ class RealAnimationManager: ObservableObject {
     // Video backgrounds (you've added these!) - Extended to 15 seconds
     static let fireVideo = AnimationSource(type: .video, fileName: "fire_background", duration: 15.0, loop: true)
     static let smokeVideo = AnimationSource(type: .video, fileName: "smoke_background", duration: 15.0, loop: true)
-    static let soilVideo = AnimationSource(type: .video, fileName: "soil_background", duration: 15.0, loop: true)
+    static let spaceVideo = AnimationSource(type: .video, fileName: "space_background", duration: 15.0, loop: true)
     static let waterVideo = AnimationSource(type: .video, fileName: "water_background", duration: 15.0, loop: true)
     
     static let backgroundVideo = AnimationSource(type: .video, fileName: "calm_background", duration: 30.0, loop: true)
@@ -606,8 +606,8 @@ struct RealAnimationContainer: View {
             return CGPoint(x: CGFloat.random(in: -0.5...0.5), y: CGFloat.random(in: -1...(-0.2)))
         case "smoke":
             return CGPoint(x: CGFloat.random(in: -0.3...0.3), y: CGFloat.random(in: -0.8...(-0.1)))
-        case "bury":
-            return CGPoint(x: CGFloat.random(in: -0.3...0.3), y: CGFloat.random(in: 0.2...1))
+        case "space":
+            return CGPoint(x: CGFloat.random(in: -0.8...0.8), y: CGFloat.random(in: -0.8...0.8))
         case "wash":
             return CGPoint(x: CGFloat.random(in: -0.5...0.5), y: CGFloat.random(in: 0.2...1))
         default:
@@ -621,8 +621,8 @@ struct RealAnimationContainer: View {
             return CGPoint(x: CGFloat.random(in: -1...1), y: CGFloat.random(in: -2...(-0.5)))
         case "smoke":
             return CGPoint(x: CGFloat.random(in: -0.5...0.5), y: CGFloat.random(in: -1.5...(-0.3)))
-        case "bury":
-            return CGPoint(x: CGFloat.random(in: -0.5...0.5), y: CGFloat.random(in: 0.5...2))
+        case "space":
+            return CGPoint(x: CGFloat.random(in: -1...1), y: CGFloat.random(in: -1...1))
         case "wash":
             return CGPoint(x: CGFloat.random(in: -1...1), y: CGFloat.random(in: 0.5...2))
         default:
@@ -636,8 +636,8 @@ struct RealAnimationContainer: View {
             return Color.orange
         case "smoke":
             return Color.gray
-        case "bury":
-            return Color.brown
+        case "space":
+            return Color.purple
         case "wash":
             return Color.blue
         default:
@@ -720,8 +720,8 @@ struct RealAnimationContainer: View {
             return CGPoint(x: CGFloat.random(in: -2...2), y: CGFloat.random(in: -3...(-1)))
         case "smoke":
             return CGPoint(x: CGFloat.random(in: -1...1), y: CGFloat.random(in: -2...(-0.5)))
-        case "bury":
-            return CGPoint(x: CGFloat.random(in: -1...1), y: CGFloat.random(in: 1...3))
+        case "space":
+            return CGPoint(x: CGFloat.random(in: -2...2), y: CGFloat.random(in: -2...2))
         case "wash":
             return CGPoint(x: CGFloat.random(in: -2...2), y: CGFloat.random(in: 1...3))
         default:
@@ -735,8 +735,8 @@ struct RealAnimationContainer: View {
             return "fire"
         case "smoke_background":
             return "smoke"
-        case "soil_background":
-            return "bury"
+        case "space_background":
+            return "space"
         case "water_background":
             return "wash"
         default:
@@ -777,21 +777,21 @@ struct RealAnimationContainer: View {
                     )
                 )
                 .blur(radius: 3)
-        case "bury":
-            // Earth particles effect
+        case "space":
+            // Cosmic stars effect
             RoundedRectangle(cornerRadius: 12)
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color.brown.opacity(0.3),
-                            Color.orange.opacity(0.2),
-                            Color.yellow.opacity(0.1)
+                            Color.purple.opacity(0.4),
+                            Color.blue.opacity(0.3),
+                            Color.indigo.opacity(0.2)
                         ],
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 )
-                .blur(radius: 2)
+                .blur(radius: 3)
         case "wash":
             // Water ripple effect
             RoundedRectangle(cornerRadius: 12)
@@ -818,8 +818,8 @@ struct RealAnimationContainer: View {
             return "Burning away..."
         case "smoke_background":
             return "Dissolving into smoke..."
-        case "soil_background":
-            return "Burying in earth..."
+        case "space_background":
+            return "Releasing into space..."
         case "water_background":
             return "Washing away..."
         default:
@@ -833,8 +833,8 @@ struct RealAnimationContainer: View {
             return "burning"
         case "smoke_background":
             return "smoking"
-        case "soil_background":
-            return "burying"
+        case "space_background":
+            return "releasing into space"
         case "water_background":
             return "washing"
         default:
@@ -875,8 +875,8 @@ struct EnhancedRitualView: View {
             CalmBurnAnimationView(worryText: text, onComplete: onComplete)
         case "smoke":
             SmokeAnimation(text: text, onComplete: onComplete)
-        case "bury":
-            BuryAnimation(text: text, onComplete: onComplete)
+        case "space":
+            SpaceAnimation(text: text, onComplete: onComplete)
         case "wash":
             WashAnimation(text: text, onComplete: onComplete)
         default:
@@ -914,17 +914,17 @@ struct EnhancedRitualView: View {
             } else {
                 print("❌ No smoke animation files found - using fallback")
             }
-        case "bury":
-            if let videoPath = Bundle.main.path(forResource: "soil_background", ofType: "mp4") {
-                print("✅ Found soil video: \(videoPath)")
-                animationSource = RealAnimationManager.soilVideo
+        case "space":
+            if let videoPath = Bundle.main.path(forResource: "space_background", ofType: "mp4") {
+                print("✅ Found space video: \(videoPath)")
+                animationSource = RealAnimationManager.spaceVideo
                 showRealAnimation = true
-            } else if let gifPath = Bundle.main.path(forResource: "earth_bury", ofType: "gif") {
-                print("✅ Found earth GIF: \(gifPath)")
-                animationSource = RealAnimationManager.earthGif
+            } else if let gifPath = Bundle.main.path(forResource: "space_animation", ofType: "gif") {
+                print("✅ Found space GIF: \(gifPath)")
+                animationSource = RealAnimationManager.spaceGif
                 showRealAnimation = true
             } else {
-                print("❌ No bury animation files found - using fallback")
+                print("❌ No space animation files found - using fallback")
             }
         case "wash":
             if let videoPath = Bundle.main.path(forResource: "water_background", ofType: "mp4") {
@@ -1008,8 +1008,8 @@ struct TextParticleView: View {
             return Color.orange.opacity(0.8)
         case "smoke":
             return Color.gray.opacity(0.6)
-        case "bury":
-            return Color.brown.opacity(0.7)
+        case "space":
+            return Color.purple.opacity(0.8)
         case "wash":
             return Color.blue.opacity(0.6)
         default:
@@ -1023,8 +1023,8 @@ struct TextParticleView: View {
             return 1.0
         case "smoke":
             return 2.0
-        case "bury":
-            return 0.5
+        case "space":
+            return 1.5
         case "wash":
             return 1.5
         default:
@@ -1053,8 +1053,8 @@ struct TextParticleView: View {
             }
         }
         
-        // Add gravity effect for some particles
-        if ritualType == "bury" {
+        // Add cosmic drift effect for space particles
+        if ritualType == "space" {
             Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
                 if currentParticle.opacity <= 0 {
                     timer.invalidate()
@@ -1062,7 +1062,9 @@ struct TextParticleView: View {
                 }
                 
                 withAnimation(.linear(duration: 0.1)) {
-                    currentParticle.velocity.y += 0.1 // Gravity
+                    // Gentle cosmic drift in all directions
+                    currentParticle.velocity.x += CGFloat.random(in: -0.05...0.05)
+                    currentParticle.velocity.y += CGFloat.random(in: -0.05...0.05)
                 }
             }
         }
