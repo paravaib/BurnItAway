@@ -287,6 +287,8 @@ struct RealAnimationContainer: View {
     @State private var animationComplete = false
     @State private var textOpacity: Double = 1.0
     @State private var animationStartTime: Date = Date()
+    @State private var textParticles: [TextParticle] = []
+    @State private var showTextParticles = false
     
     var body: some View {
         ZStack {
@@ -301,7 +303,7 @@ struct RealAnimationContainer: View {
                 .onAppear {
                     print("🎬 Rendering GIF: \(source.fileName)")
                     print("🎬 GIF appeared")
-                    startTextFadeAnimation()
+                    startTextDissolutionAnimation()
                     if let duration = source.duration {
                         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                             animationComplete = true
@@ -318,7 +320,7 @@ struct RealAnimationContainer: View {
                 .onAppear {
                     print("🎬 Rendering Video: \(source.fileName)")
                     print("🎬 Video appeared")
-                    startTextFadeAnimation()
+                    startTextDissolutionAnimation()
                     if let duration = source.duration {
                         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                             animationComplete = true
@@ -336,7 +338,7 @@ struct RealAnimationContainer: View {
                 .onAppear {
                     print("🎬 Rendering Lottie: \(source.fileName)")
                     print("🎬 Lottie appeared")
-                    startTextFadeAnimation()
+                    startTextDissolutionAnimation()
                     if let duration = source.duration {
                         DispatchQueue.main.asyncAfter(deadline: .now() + duration) {
                             animationComplete = true
@@ -359,11 +361,18 @@ struct RealAnimationContainer: View {
                 .background(Color.clear)
                 .onAppear {
                     print("🎬 Rendering SpriteKit placeholder")
-                    startTextFadeAnimation()
+                    startTextDissolutionAnimation()
                 }
             }
             
-            // Text overlay that fades away
+            // Text particles that break off and follow the video theme
+            if showTextParticles {
+                ForEach(textParticles, id: \.id) { particle in
+                    TextParticleView(particle: particle, ritualType: getRitualType())
+                }
+            }
+            
+            // Enhanced text overlay with environmental effects
             if !text.isEmpty {
                 VStack {
                     Spacer()
@@ -383,7 +392,14 @@ struct RealAnimationContainer: View {
                         )
                         .opacity(textOpacity)
                         .scaleEffect(textOpacity > 0.3 ? 1.0 : 0.7)
+                        .blur(radius: textOpacity < 0.5 ? (1.0 - textOpacity) * 3 : 0)
                         .animation(.easeInOut(duration: 1.0), value: textOpacity)
+                        .overlay(
+                            // Environmental effect overlay
+                            getEnvironmentalEffect()
+                                .opacity(textOpacity < 0.7 ? (0.7 - textOpacity) * 2 : 0)
+                                .animation(.easeInOut(duration: 1.0), value: textOpacity)
+                        )
                     
                     Spacer()
                 }
@@ -419,12 +435,133 @@ struct RealAnimationContainer: View {
         }
     }
     
-    private func startTextFadeAnimation() {
+    private func startTextDissolutionAnimation() {
         // Start fading text after 3 seconds, fade slowly over 8 seconds
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
             withAnimation(.easeInOut(duration: 8.0)) {
                 textOpacity = 0.0
             }
+            
+            // Create text particles that break off
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+                createTextParticles()
+                showTextParticles = true
+            }
+        }
+    }
+    
+    private func createTextParticles() {
+        let particleCount = 15
+        textParticles = (0..<particleCount).map { _ in
+            TextParticle(
+                id: UUID(),
+                x: CGFloat.random(in: -100...100),
+                y: CGFloat.random(in: -50...50),
+                size: CGFloat.random(in: 2...6),
+                opacity: 1.0,
+                velocity: getParticleVelocity(),
+                rotation: Double.random(in: 0...360),
+                rotationSpeed: Double.random(in: -5...5),
+                scale: CGFloat.random(in: 0.5...1.2)
+            )
+        }
+    }
+    
+    private func getParticleVelocity() -> CGPoint {
+        switch getRitualType() {
+        case "fire":
+            return CGPoint(x: CGFloat.random(in: -2...2), y: CGFloat.random(in: -3...(-1)))
+        case "smoke":
+            return CGPoint(x: CGFloat.random(in: -1...1), y: CGFloat.random(in: -2...(-0.5)))
+        case "bury":
+            return CGPoint(x: CGFloat.random(in: -1...1), y: CGFloat.random(in: 1...3))
+        case "wash":
+            return CGPoint(x: CGFloat.random(in: -2...2), y: CGFloat.random(in: 1...3))
+        default:
+            return CGPoint(x: CGFloat.random(in: -1...1), y: CGFloat.random(in: -1...1))
+        }
+    }
+    
+    private func getRitualType() -> String {
+        switch source.fileName {
+        case "fire_background":
+            return "fire"
+        case "smoke_background":
+            return "smoke"
+        case "soil_background":
+            return "bury"
+        case "water_background":
+            return "wash"
+        default:
+            return "fire"
+        }
+    }
+    
+    @ViewBuilder
+    private func getEnvironmentalEffect() -> some View {
+        switch getRitualType() {
+        case "fire":
+            // Fire flicker effect
+            RoundedRectangle(cornerRadius: 12)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.orange.opacity(0.3),
+                            Color.red.opacity(0.2),
+                            Color.yellow.opacity(0.1)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .blur(radius: 2)
+        case "smoke":
+            // Smoke wisps effect
+            RoundedRectangle(cornerRadius: 12)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.gray.opacity(0.4),
+                            Color.white.opacity(0.2),
+                            Color.clear
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .blur(radius: 3)
+        case "bury":
+            // Earth particles effect
+            RoundedRectangle(cornerRadius: 12)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.brown.opacity(0.3),
+                            Color.orange.opacity(0.2),
+                            Color.yellow.opacity(0.1)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .blur(radius: 2)
+        case "wash":
+            // Water ripple effect
+            RoundedRectangle(cornerRadius: 12)
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.blue.opacity(0.3),
+                            Color.cyan.opacity(0.2),
+                            Color.white.opacity(0.1)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+                .blur(radius: 2)
+        default:
+            EmptyView()
         }
     }
     
@@ -561,6 +698,103 @@ struct EnhancedRitualView: View {
         
         print("🎬 Animation source: \(animationSource?.fileName ?? "none")")
         print("🎬 Show real animation: \(showRealAnimation)")
+    }
+}
+
+// MARK: - Text Particle Model
+struct TextParticle: Identifiable {
+    let id: UUID
+    var x: CGFloat
+    var y: CGFloat
+    var size: CGFloat
+    var opacity: Double
+    var velocity: CGPoint
+    var rotation: Double
+    var rotationSpeed: Double
+    var scale: CGFloat
+}
+
+// MARK: - Text Particle View
+struct TextParticleView: View {
+    let particle: TextParticle
+    let ritualType: String
+    
+    @State private var currentParticle = TextParticle(
+        id: UUID(),
+        x: 0,
+        y: 0,
+        size: 0,
+        opacity: 0,
+        velocity: CGPoint(x: 0, y: 0),
+        rotation: 0,
+        rotationSpeed: 0,
+        scale: 0
+    )
+    
+    var body: some View {
+        Circle()
+            .fill(getParticleColor())
+            .frame(width: currentParticle.size, height: currentParticle.size)
+            .position(x: currentParticle.x, y: currentParticle.y)
+            .rotationEffect(.degrees(currentParticle.rotation))
+            .scaleEffect(currentParticle.scale)
+            .opacity(currentParticle.opacity)
+            .blur(radius: getBlurRadius())
+            .onAppear {
+                currentParticle = particle
+                startParticleAnimation()
+            }
+    }
+    
+    private func getParticleColor() -> Color {
+        switch ritualType {
+        case "fire":
+            return Color.orange.opacity(0.8)
+        case "smoke":
+            return Color.gray.opacity(0.6)
+        case "bury":
+            return Color.brown.opacity(0.7)
+        case "wash":
+            return Color.blue.opacity(0.6)
+        default:
+            return Color.white.opacity(0.5)
+        }
+    }
+    
+    private func getBlurRadius() -> CGFloat {
+        switch ritualType {
+        case "fire":
+            return 1.0
+        case "smoke":
+            return 2.0
+        case "bury":
+            return 0.5
+        case "wash":
+            return 1.5
+        default:
+            return 1.0
+        }
+    }
+    
+    private func startParticleAnimation() {
+        withAnimation(.easeOut(duration: 4.0)) {
+            currentParticle.x += currentParticle.velocity.x * 100
+            currentParticle.y += currentParticle.velocity.y * 100
+            currentParticle.opacity = 0.0
+            currentParticle.scale *= 1.5
+        }
+        
+        // Continuous rotation
+        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
+            if currentParticle.opacity <= 0 {
+                timer.invalidate()
+                return
+            }
+            
+            withAnimation(.linear(duration: 0.1)) {
+                currentParticle.rotation += currentParticle.rotationSpeed
+            }
+        }
     }
 }
 
