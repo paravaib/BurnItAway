@@ -47,11 +47,11 @@ class RealAnimationManager: ObservableObject {
     static let fireLottie = AnimationSource(type: .lottie, fileName: "fire_lottie", duration: 8.0)
     static let waterLottie = AnimationSource(type: .lottie, fileName: "water_lottie", duration: 10.0)
     
-    // Video backgrounds (you've added these!)
-    static let fireVideo = AnimationSource(type: .video, fileName: "fire_background", duration: 10.0, loop: true)
-    static let shredVideo = AnimationSource(type: .video, fileName: "shred_background", duration: 8.0, loop: true)
-    static let soilVideo = AnimationSource(type: .video, fileName: "soil_background", duration: 12.0, loop: true)
-    static let waterVideo = AnimationSource(type: .video, fileName: "water_background", duration: 10.0, loop: true)
+    // Video backgrounds (you've added these!) - Extended to 15 seconds
+    static let fireVideo = AnimationSource(type: .video, fileName: "fire_background", duration: 15.0, loop: true)
+    static let shredVideo = AnimationSource(type: .video, fileName: "shred_background", duration: 15.0, loop: true)
+    static let soilVideo = AnimationSource(type: .video, fileName: "soil_background", duration: 15.0, loop: true)
+    static let waterVideo = AnimationSource(type: .video, fileName: "water_background", duration: 15.0, loop: true)
     
     static let backgroundVideo = AnimationSource(type: .video, fileName: "calm_background", duration: 30.0, loop: true)
 }
@@ -382,8 +382,8 @@ struct RealAnimationContainer: View {
                                 )
                         )
                         .opacity(textOpacity)
-                        .scaleEffect(textOpacity > 0.5 ? 1.0 : 0.8)
-                        .animation(.easeInOut(duration: 0.5), value: textOpacity)
+                        .scaleEffect(textOpacity > 0.3 ? 1.0 : 0.7)
+                        .animation(.easeInOut(duration: 1.0), value: textOpacity)
                     
                     Spacer()
                 }
@@ -398,15 +398,15 @@ struct RealAnimationContainer: View {
                         Text(getProgressText())
                             .font(CalmDesignSystem.Typography.caption)
                             .foregroundColor(.white.opacity(0.8))
-                            .opacity(textOpacity > 0.3 ? 1.0 : 0.0)
-                            .animation(.easeInOut(duration: 0.5), value: textOpacity)
+                            .opacity(textOpacity > 0.5 ? 1.0 : 0.0)
+                            .animation(.easeInOut(duration: 1.0), value: textOpacity)
                         
                         Text("Symbolic \(getRitualName()) only - your thoughts are safe")
                             .font(CalmDesignSystem.Typography.caption)
                             .foregroundColor(.white.opacity(0.6))
                             .multilineTextAlignment(.center)
-                            .opacity(textOpacity > 0.3 ? 0.8 : 0.0)
-                            .animation(.easeInOut(duration: 0.5), value: textOpacity)
+                            .opacity(textOpacity > 0.4 ? 0.8 : 0.0)
+                            .animation(.easeInOut(duration: 1.0), value: textOpacity)
                     }
                     .padding(.bottom, CalmDesignSystem.Spacing.xxxl)
                 }
@@ -420,9 +420,9 @@ struct RealAnimationContainer: View {
     }
     
     private func startTextFadeAnimation() {
-        // Start fading text after 2 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            withAnimation(.easeInOut(duration: 3.0)) {
+        // Start fading text after 3 seconds, fade slowly over 8 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            withAnimation(.easeInOut(duration: 8.0)) {
                 textOpacity = 0.0
             }
         }
