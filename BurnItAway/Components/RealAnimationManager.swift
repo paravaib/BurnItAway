@@ -378,70 +378,19 @@ struct RealAnimationContainer: View {
                 }
             }
             
-            // Enhanced text overlay with environmental effects
+            // Melting text overlay with realistic letter-by-letter melting
             if !text.isEmpty {
                 VStack {
                     Spacer()
                     
-                    ZStack {
-                        // Glow effect layers
-                        ForEach(0..<3, id: \.self) { index in
-                            Text(text)
-                                .font(CalmDesignSystem.Typography.largeTitle)
-                                .foregroundColor(getGlowColor())
-                                .multilineTextAlignment(.center)
-                                .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                                .blur(radius: glowRadius + CGFloat(index * 2))
-                                .opacity(glowIntensity * (1.0 - Double(index) * 0.3))
+                    MeltingTextView(
+                        text: text,
+                        ritualType: getRitualType(),
+                        onComplete: {
+                            // Text melting complete, continue with video
                         }
-                        
-                        // Main text
-                        Text(text)
-                            .font(CalmDesignSystem.Typography.largeTitle)
-                            .foregroundColor(getTextColor())
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(getBackgroundColor())
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 12)
-                                            .stroke(getGlowColor().opacity(0.8), lineWidth: 2)
-                                    )
-                            )
-                            .opacity(textOpacity)
-                            .scaleEffect(getTextScale())
-                            .rotationEffect(.degrees(textRotation))
-                            .blur(radius: getTextBlur())
-                            .shadow(color: getGlowColor(), radius: glowRadius, x: 0, y: 0)
-                            .overlay(
-                                // Shimmer effect
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [
-                                                Color.clear,
-                                                getGlowColor().opacity(0.3),
-                                                Color.clear
-                                            ],
-                                            startPoint: .leading,
-                                            endPoint: .trailing
-                                        )
-                                    )
-                                    .opacity(textShimmer)
-                                    .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: textShimmer)
-                            )
-                            .overlay(
-                                // Environmental effect overlay
-                                getEnvironmentalEffect()
-                                    .opacity(textOpacity < 0.7 ? (0.7 - textOpacity) * 2 : 0)
-                            )
-                    }
-                    .animation(.easeInOut(duration: 1.0), value: textOpacity)
-                    .animation(.easeInOut(duration: 2.0), value: textScale)
-                    .animation(.easeInOut(duration: 1.5), value: textRotation)
-                    .animation(.easeInOut(duration: 1.0), value: glowIntensity)
-                    .animation(.easeInOut(duration: 1.0), value: glowRadius)
+                    )
+                    .frame(height: 100)
                     
                     Spacer()
                 }
