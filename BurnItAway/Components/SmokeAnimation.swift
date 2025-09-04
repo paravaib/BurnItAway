@@ -146,7 +146,7 @@ struct SmokeAnimation: View {
                 y: CGFloat.random(in: -50...50),
                 size: CGFloat.random(in: 2...8),
                 opacity: 1.0,
-                velocity: CGPoint(x: CGFloat.random(in: -1...1), y: CGFloat.random(in: -2...-0.5)),
+                velocity: CGPoint(x: CGFloat.random(in: -1...1), y: CGFloat.random(in: -2...(-0.5))),
                 rotation: Double.random(in: 0...360),
                 rotationSpeed: Double.random(in: -2...2),
                 scale: CGFloat.random(in: 0.5...1.5)
