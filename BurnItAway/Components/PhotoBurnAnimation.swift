@@ -21,6 +21,8 @@ class PhotoBurnAnimationController: ObservableObject {
     @Published var showBreathingIndicator = false
     @Published var isAnimating = false
     @Published var animationPhase: String = "preparing"
+    @Published var showBurningParticles = false
+    @Published var burningParticleIntensity: Double = 0.0
     
     private var animationTimer: Timer?
     private var displayLink: CADisplayLink?
@@ -70,6 +72,34 @@ class PhotoBurnAnimationController: ObservableObject {
         return t < 0.5 ? 8 * t * t * t * t : 1 - pow(-2 * t + 2, 4) / 2
     }
     
+    // Enhanced fire intensity animation like text burning
+    private func startFireIntensityAnimation() {
+        // Start with low intensity and build up gradually
+        fireIntensity = 0.0
+        
+        // Build up fire intensity over 3 seconds
+        withAnimation(.easeInOut(duration: 3.0)) {
+            fireIntensity = 1.0
+        }
+        
+        // Start burning particles after fire intensity builds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            guard !self.isCleanedUp else { return }
+            withAnimation(.easeInOut(duration: 0.5)) {
+                self.showBurningParticles = true
+            }
+            self.startBurningParticleAnimation()
+        }
+    }
+    
+    // Enhanced burning particle animation
+    private func startBurningParticleAnimation() {
+        // Animate burning particle intensity
+        withAnimation(.easeInOut(duration: 2.0)) {
+            burningParticleIntensity = 1.0
+        }
+    }
+    
     func startBurnAnimation() {
         guard !isCleanedUp else { return }
         
@@ -105,6 +135,9 @@ class PhotoBurnAnimationController: ObservableObject {
             // Start fire sound when fire appears
             self.fireSoundManager.startFireSounds()
             self.animationPhase = "burning"
+            
+            // Start enhanced fire intensity animation
+            self.startFireIntensityAnimation()
         }
         
         // Begin burning process immediately (no delay)
@@ -153,6 +186,15 @@ class PhotoBurnAnimationController: ObservableObject {
         print("🔥 Starting gradual fire fade-out...")
         animationPhase = "fading"
         
+        // Start fading burning particles first
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            guard !self.isCleanedUp else { return }
+            print("🔥 Fading out burning particles...")
+            withAnimation(.easeOut(duration: 2.0)) {
+                self.burningParticleIntensity = 0.0
+            }
+        }
+        
         // Gradually reduce fire intensity over 7 seconds
         withAnimation(.easeOut(duration: 7.0)) {
             fireIntensity = 0.0
@@ -188,6 +230,15 @@ class PhotoBurnAnimationController: ObservableObject {
             print("🔥 Fading out fire completely...")
             withAnimation(.easeOut(duration: 1.0)) {
                 self.showFire = false
+            }
+        }
+        
+        // Fade out burning particles completely
+        DispatchQueue.main.asyncAfter(deadline: .now() + 7.5) {
+            guard !self.isCleanedUp else { return }
+            print("🔥 Fading out burning particles completely...")
+            withAnimation(.easeOut(duration: 0.5)) {
+                self.showBurningParticles = false
             }
         }
         
@@ -299,6 +350,14 @@ struct PhotoBurnAnimation: View {
                     .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
                     .ignoresSafeArea(.all)
                     .transition(.opacity.combined(with: .scale))
+            }
+            
+            // Enhanced burning particles
+            if controller.showBurningParticles {
+                BurningParticlesView(intensity: controller.burningParticleIntensity)
+                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
+                    .ignoresSafeArea(.all)
+                    .transition(.opacity)
             }
             
             // Main content
