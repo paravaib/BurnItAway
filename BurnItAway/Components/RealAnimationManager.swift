@@ -292,6 +292,9 @@ struct RealAnimationContainer: View {
     @State private var textScale: CGFloat = 1.0
     @State private var textRotation: Double = 0.0
     @State private var explosionPhase: ExplosionPhase = .normal
+    @State private var glowIntensity: Double = 0.0
+    @State private var glowRadius: CGFloat = 0.0
+    @State private var textShimmer: Double = 0.0
     
     var body: some View {
         ZStack {
@@ -380,32 +383,65 @@ struct RealAnimationContainer: View {
                 VStack {
                     Spacer()
                     
-                    Text(text)
-                        .font(CalmDesignSystem.Typography.largeTitle)
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.black.opacity(0.3))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
-                                )
-                        )
-                        .opacity(textOpacity)
-                        .scaleEffect(getTextScale())
-                        .rotationEffect(.degrees(textRotation))
-                        .blur(radius: getTextBlur())
-                        .animation(.easeInOut(duration: 1.0), value: textOpacity)
-                        .animation(.easeInOut(duration: 2.0), value: textScale)
-                        .animation(.easeInOut(duration: 1.5), value: textRotation)
-                        .overlay(
-                            // Environmental effect overlay
-                            getEnvironmentalEffect()
-                                .opacity(textOpacity < 0.7 ? (0.7 - textOpacity) * 2 : 0)
-                                .animation(.easeInOut(duration: 1.0), value: textOpacity)
-                        )
+                    ZStack {
+                        // Glow effect layers
+                        ForEach(0..<3, id: \.self) { index in
+                            Text(text)
+                                .font(CalmDesignSystem.Typography.largeTitle)
+                                .foregroundColor(getGlowColor())
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                                .blur(radius: glowRadius + CGFloat(index * 2))
+                                .opacity(glowIntensity * (1.0 - Double(index) * 0.3))
+                        }
+                        
+                        // Main text
+                        Text(text)
+                            .font(CalmDesignSystem.Typography.largeTitle)
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                            .background(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(Color.black.opacity(0.3))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12)
+                                            .stroke(getGlowColor().opacity(0.8), lineWidth: 2)
+                                    )
+                            )
+                            .opacity(textOpacity)
+                            .scaleEffect(getTextScale())
+                            .rotationEffect(.degrees(textRotation))
+                            .blur(radius: getTextBlur())
+                            .shadow(color: getGlowColor(), radius: glowRadius, x: 0, y: 0)
+                            .overlay(
+                                // Shimmer effect
+                                RoundedRectangle(cornerRadius: 12)
+                                    .fill(
+                                        LinearGradient(
+                                            colors: [
+                                                Color.clear,
+                                                getGlowColor().opacity(0.3),
+                                                Color.clear
+                                            ],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .opacity(textShimmer)
+                                    .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: textShimmer)
+                            )
+                            .overlay(
+                                // Environmental effect overlay
+                                getEnvironmentalEffect()
+                                    .opacity(textOpacity < 0.7 ? (0.7 - textOpacity) * 2 : 0)
+                            )
+                    }
+                    .animation(.easeInOut(duration: 1.0), value: textOpacity)
+                    .animation(.easeInOut(duration: 2.0), value: textScale)
+                    .animation(.easeInOut(duration: 1.5), value: textRotation)
+                    .animation(.easeInOut(duration: 1.0), value: glowIntensity)
+                    .animation(.easeInOut(duration: 1.0), value: glowRadius)
                     
                     Spacer()
                 }
@@ -444,36 +480,54 @@ struct RealAnimationContainer: View {
     private func startTextDissolutionAnimation() {
         // Phase 1: Normal display (0-3 seconds)
         explosionPhase = .normal
+        textShimmer = 0.0
         
-        // Phase 2: Start slow expansion (3-5 seconds)
+        // Phase 2: Start glowing (3-5 seconds)
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-            explosionPhase = .expanding
-            withAnimation(.easeOut(duration: 2.0)) {
-                textScale = 1.3
-                textRotation = Double.random(in: -15...15)
+            explosionPhase = .glowing
+            withAnimation(.easeInOut(duration: 2.0)) {
+                glowIntensity = 0.6
+                glowRadius = 8.0
+                textShimmer = 1.0
+                textScale = 1.1
             }
         }
         
-        // Phase 3: Explosion begins (5-7 seconds)
+        // Phase 3: Bright glow (5-7 seconds)
         DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
-            explosionPhase = .exploding
-            withAnimation(.easeOut(duration: 2.0)) {
-                textScale = 2.0
-                textRotation = Double.random(in: -45...45)
+            explosionPhase = .brightGlow
+            withAnimation(.easeInOut(duration: 2.0)) {
+                glowIntensity = 1.0
+                glowRadius = 15.0
+                textScale = 1.3
+                textRotation = Double.random(in: -10...10)
             }
             
-            // Create explosion particles
-            createExplosionParticles()
+            // Create glowing particles
+            createGlowingParticles()
             showTextParticles = true
         }
         
-        // Phase 4: Final dissolution (7-11 seconds)
+        // Phase 4: Start dissolving (7-9 seconds)
         DispatchQueue.main.asyncAfter(deadline: .now() + 7.0) {
             explosionPhase = .dissolving
-            withAnimation(.easeInOut(duration: 4.0)) {
+            withAnimation(.easeInOut(duration: 2.0)) {
+                textOpacity = 0.3
+                textScale = 0.8
+                glowIntensity = 0.4
+                glowRadius = 20.0
+            }
+        }
+        
+        // Phase 5: Final vanishing (9-11 seconds)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 9.0) {
+            explosionPhase = .vanished
+            withAnimation(.easeInOut(duration: 2.0)) {
                 textOpacity = 0.0
                 textScale = 0.1
-                textRotation = Double.random(in: -180...180)
+                glowIntensity = 0.0
+                glowRadius = 0.0
+                textShimmer = 0.0
             }
         }
     }
@@ -512,6 +566,53 @@ struct RealAnimationContainer: View {
         }
     }
     
+    private func createGlowingParticles() {
+        let particleCount = 20 // Glowing particles
+        textParticles = (0..<particleCount).map { _ in
+            TextParticle(
+                id: UUID(),
+                x: CGFloat.random(in: -120...120),
+                y: CGFloat.random(in: -60...60),
+                size: CGFloat.random(in: 4...10),
+                opacity: 1.0,
+                velocity: getGlowingVelocity(),
+                rotation: Double.random(in: 0...360),
+                rotationSpeed: Double.random(in: -8...8),
+                scale: CGFloat.random(in: 1.0...2.0)
+            )
+        }
+    }
+    
+    private func getGlowingVelocity() -> CGPoint {
+        switch getRitualType() {
+        case "fire":
+            return CGPoint(x: CGFloat.random(in: -1...1), y: CGFloat.random(in: -2...(-0.5)))
+        case "smoke":
+            return CGPoint(x: CGFloat.random(in: -0.5...0.5), y: CGFloat.random(in: -1.5...(-0.3)))
+        case "bury":
+            return CGPoint(x: CGFloat.random(in: -0.5...0.5), y: CGFloat.random(in: 0.5...2))
+        case "wash":
+            return CGPoint(x: CGFloat.random(in: -1...1), y: CGFloat.random(in: 0.5...2))
+        default:
+            return CGPoint(x: CGFloat.random(in: -0.5...0.5), y: CGFloat.random(in: -1...1))
+        }
+    }
+    
+    private func getGlowColor() -> Color {
+        switch getRitualType() {
+        case "fire":
+            return Color.orange
+        case "smoke":
+            return Color.gray
+        case "bury":
+            return Color.brown
+        case "wash":
+            return Color.blue
+        default:
+            return Color.white
+        }
+    }
+    
     private func getExplosionVelocity() -> CGPoint {
         let angle = Double.random(in: 0...2 * .pi)
         let speed = CGFloat.random(in: 2...6)
@@ -525,11 +626,13 @@ struct RealAnimationContainer: View {
         switch explosionPhase {
         case .normal:
             return 1.0
-        case .expanding:
+        case .glowing:
             return textScale
-        case .exploding:
+        case .brightGlow:
             return textScale
         case .dissolving:
+            return textScale
+        case .vanished:
             return textScale
         }
     }
@@ -538,12 +641,14 @@ struct RealAnimationContainer: View {
         switch explosionPhase {
         case .normal:
             return 0
-        case .expanding:
+        case .glowing:
             return 1.0
-        case .exploding:
+        case .brightGlow:
             return 2.0
         case .dissolving:
-            return 4.0
+            return 3.0
+        case .vanished:
+            return 5.0
         }
     }
     
@@ -784,9 +889,10 @@ struct EnhancedRitualView: View {
 // MARK: - Explosion Phase Enum
 enum ExplosionPhase {
     case normal
-    case expanding
-    case exploding
+    case glowing
+    case brightGlow
     case dissolving
+    case vanished
 }
 
 // MARK: - Text Particle Model
