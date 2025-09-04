@@ -289,6 +289,9 @@ struct RealAnimationContainer: View {
     @State private var animationStartTime: Date = Date()
     @State private var textParticles: [TextParticle] = []
     @State private var showTextParticles = false
+    @State private var textScale: CGFloat = 1.0
+    @State private var textRotation: Double = 0.0
+    @State private var explosionPhase: ExplosionPhase = .normal
     
     var body: some View {
         ZStack {
@@ -391,9 +394,12 @@ struct RealAnimationContainer: View {
                                 )
                         )
                         .opacity(textOpacity)
-                        .scaleEffect(textOpacity > 0.3 ? 1.0 : 0.7)
-                        .blur(radius: textOpacity < 0.5 ? (1.0 - textOpacity) * 3 : 0)
+                        .scaleEffect(getTextScale())
+                        .rotationEffect(.degrees(textRotation))
+                        .blur(radius: getTextBlur())
                         .animation(.easeInOut(duration: 1.0), value: textOpacity)
+                        .animation(.easeInOut(duration: 2.0), value: textScale)
+                        .animation(.easeInOut(duration: 1.5), value: textRotation)
                         .overlay(
                             // Environmental effect overlay
                             getEnvironmentalEffect()
@@ -436,16 +442,38 @@ struct RealAnimationContainer: View {
     }
     
     private func startTextDissolutionAnimation() {
-        // Start fading text after 3 seconds, fade slowly over 8 seconds
+        // Phase 1: Normal display (0-3 seconds)
+        explosionPhase = .normal
+        
+        // Phase 2: Start slow expansion (3-5 seconds)
         DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-            withAnimation(.easeInOut(duration: 8.0)) {
-                textOpacity = 0.0
+            explosionPhase = .expanding
+            withAnimation(.easeOut(duration: 2.0)) {
+                textScale = 1.3
+                textRotation = Double.random(in: -15...15)
+            }
+        }
+        
+        // Phase 3: Explosion begins (5-7 seconds)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+            explosionPhase = .exploding
+            withAnimation(.easeOut(duration: 2.0)) {
+                textScale = 2.0
+                textRotation = Double.random(in: -45...45)
             }
             
-            // Create text particles that break off
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
-                createTextParticles()
-                showTextParticles = true
+            // Create explosion particles
+            createExplosionParticles()
+            showTextParticles = true
+        }
+        
+        // Phase 4: Final dissolution (7-11 seconds)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 7.0) {
+            explosionPhase = .dissolving
+            withAnimation(.easeInOut(duration: 4.0)) {
+                textOpacity = 0.0
+                textScale = 0.1
+                textRotation = Double.random(in: -180...180)
             }
         }
     }
@@ -464,6 +492,58 @@ struct RealAnimationContainer: View {
                 rotationSpeed: Double.random(in: -5...5),
                 scale: CGFloat.random(in: 0.5...1.2)
             )
+        }
+    }
+    
+    private func createExplosionParticles() {
+        let particleCount = 25 // More particles for explosion
+        textParticles = (0..<particleCount).map { _ in
+            TextParticle(
+                id: UUID(),
+                x: CGFloat.random(in: -150...150),
+                y: CGFloat.random(in: -75...75),
+                size: CGFloat.random(in: 3...8),
+                opacity: 1.0,
+                velocity: getExplosionVelocity(),
+                rotation: Double.random(in: 0...360),
+                rotationSpeed: Double.random(in: -10...10),
+                scale: CGFloat.random(in: 0.8...1.5)
+            )
+        }
+    }
+    
+    private func getExplosionVelocity() -> CGPoint {
+        let angle = Double.random(in: 0...2 * .pi)
+        let speed = CGFloat.random(in: 2...6)
+        return CGPoint(
+            x: cos(angle) * speed,
+            y: sin(angle) * speed
+        )
+    }
+    
+    private func getTextScale() -> CGFloat {
+        switch explosionPhase {
+        case .normal:
+            return 1.0
+        case .expanding:
+            return textScale
+        case .exploding:
+            return textScale
+        case .dissolving:
+            return textScale
+        }
+    }
+    
+    private func getTextBlur() -> CGFloat {
+        switch explosionPhase {
+        case .normal:
+            return 0
+        case .expanding:
+            return 1.0
+        case .exploding:
+            return 2.0
+        case .dissolving:
+            return 4.0
         }
     }
     
@@ -701,6 +781,14 @@ struct EnhancedRitualView: View {
     }
 }
 
+// MARK: - Explosion Phase Enum
+enum ExplosionPhase {
+    case normal
+    case expanding
+    case exploding
+    case dissolving
+}
+
 // MARK: - Text Particle Model
 struct TextParticle: Identifiable {
     let id: UUID
@@ -777,22 +865,37 @@ struct TextParticleView: View {
     }
     
     private func startParticleAnimation() {
-        withAnimation(.easeOut(duration: 4.0)) {
-            currentParticle.x += currentParticle.velocity.x * 100
-            currentParticle.y += currentParticle.velocity.y * 100
+        // Enhanced explosion animation
+        withAnimation(.easeOut(duration: 5.0)) {
+            currentParticle.x += currentParticle.velocity.x * 150
+            currentParticle.y += currentParticle.velocity.y * 150
             currentParticle.opacity = 0.0
-            currentParticle.scale *= 1.5
+            currentParticle.scale *= 2.0
         }
         
-        // Continuous rotation
-        Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
+        // Continuous rotation with varying speed
+        Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
             if currentParticle.opacity <= 0 {
                 timer.invalidate()
                 return
             }
             
-            withAnimation(.linear(duration: 0.1)) {
+            withAnimation(.linear(duration: 0.05)) {
                 currentParticle.rotation += currentParticle.rotationSpeed
+            }
+        }
+        
+        // Add gravity effect for some particles
+        if ritualType == "bury" {
+            Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { timer in
+                if currentParticle.opacity <= 0 {
+                    timer.invalidate()
+                    return
+                }
+                
+                withAnimation(.linear(duration: 0.1)) {
+                    currentParticle.velocity.y += 0.1 // Gravity
+                }
             }
         }
     }
