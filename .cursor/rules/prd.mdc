@@ -1,0 +1,122 @@
+---
+alwaysApply: true
+---
+## 2. Target Audience
+- Adults in the US experiencing nighttime anxiety or stress.  
+- People seeking simple, private, ad-free wellness apps.  
+- Sleep hygiene / mental wellness enthusiasts.  
+
+---
+
+## 3. Core User Flow
+
+### Ritual 1: Burn Anxiety (Free)
+1. Home screen → choose **Burn Anxiety**.  
+2. Input worry → tap **Release**.  
+3. Animation: text chars, fades, turns to ash, drifts away.  
+4. Closing screen: *“It’s released. Rest now.”*
+
+### Ritual 2: Store Positivity (Premium)
+1. Home screen → choose **Store Positivity**.  
+2. Input positive thought → tap **Plant**.  
+3. Animation: text transforms into glowing seed/lantern, floats away.  
+4. Thought saved in local CoreData database.  
+5. User can revisit stored thoughts in a simple list view (“Garden of Positivity”).
+
+---
+
+## 4. Features (MVP)
+
+### Must-Have
+- Gradient dark background (indigo → black).  
+- Text input with glowing buttons (Release / Plant).  
+- Burn animation with ash particle effect.  
+- Store animation with seed/lantern effect.  
+- CoreData storage for positive thoughts.  
+- View stored thoughts in simple list.  
+- Offline-first (no backend, no accounts).  
+
+### Nice-to-Have (Phase 2)
+- Alternative animations (water dissolve, wind, floating paper lanterns).  
+- Soundscapes (fire crackle, ocean waves, soft chimes).  
+- Settings toggle for sound + haptics.  
+- Subscription monetization: $2.99/month or $19.99/year.  
+
+---
+
+## 5. Non-Goals (MVP)
+- No social features.  
+- No text saving for “Burn” ritual (must disappear permanently).  
+- No cloud sync or analytics.  
+
+---
+
+## 6. UX / UI Requirements
+
+### Visual Style
+- Minimal, dark, soothing.  
+- Large readable fonts.  
+- Indigo, violet, ember-orange accent.  
+- Smooth, slow animations (easeInOut, 5–7 sec cycles).  
+
+### Accessibility
+- High-contrast text.  
+- Support for Dynamic Type.  
+- Optional haptic feedback when rituals start.  
+
+---
+
+## 7. Technical Requirements
+- **Language:** Swift + SwiftUI.  
+- **Animations:** Core Animation / Canvas / SpriteKit (for particles).  
+- **Persistence:** CoreData for PositiveThought entity (`id: UUID, text: String, date: Date`).  
+- **Offline-first:** All features work without internet.  
+- **App Size:** <100MB.  
+
+---
+
+## 8. Monetization (Planned Phase 2)
+- Free core ritual: Burn Anxiety.  
+- Premium: Store Positivity + extra animations/sounds.  
+- Subscription: $2.99/month, $19.99/year.  
+- No ads (to maintain calm/healer vibe).  
+
+---
+
+## 9. Success Metrics
+- Downloads (goal: 10k in first 6 months).  
+- Retention: % of users performing a ritual 3+ nights/week.  
+- Conversion: 3–5% of users subscribe to Premium.  
+- Revenue: Target $10k MRR within 12–18 months.  
+
+---
+
+## 10. File Structure (for Development)
+```
+ReleaseAndRestore/
+│
+├── ReleaseAndRestoreApp.swift   // Entry point
+├── ContentView.swift            // Home screen
+│
+├── Views/
+│   ├── BurnView.swift
+│   ├── BurnAnimationView.swift
+│   ├── BurnCompleteView.swift
+│   ├── StoreView.swift
+│   ├── StoreAnimationView.swift
+│   ├── StoredListView.swift
+│
+├── Components/
+│   ├── GlowingButton.swift
+│   ├── AshParticles.swift
+│   ├── LanternParticles.swift
+│
+├── Models/
+│   ├── PositiveThought.swift
+│
+├── Persistence/
+│   ├── PersistenceController.swift
+│
+└── Assets.xcassets/
+```
+
