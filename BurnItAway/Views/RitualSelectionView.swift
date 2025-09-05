@@ -11,6 +11,7 @@ struct RitualSelectionView: View {
     @EnvironmentObject var premium: PremiumState
     @State private var selectedRitual: RitualType?
     @State private var showSubscriptionPaywall = false
+    @State private var showContent = false
     
     var body: some View {
         if #available(iOS 17.0, *) {
@@ -25,6 +26,8 @@ struct RitualSelectionView: View {
                             .minimumScaleFactor(0.8)
                             .allowsTightening(true)
                             .multilineTextAlignment(.center)
+                            .opacity(showContent ? 1.0 : 0.0)
+                            .animation(.easeInOut(duration: 0.6), value: showContent)
                         
                         Text("Select how you'd like to symbolically release your worry")
                             .font(CalmDesignSystem.Typography.subheadline)
@@ -34,6 +37,8 @@ struct RitualSelectionView: View {
                             .minimumScaleFactor(0.7)
                             .allowsTightening(true)
                             .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                            .opacity(showContent ? 1.0 : 0.0)
+                            .animation(.easeInOut(duration: 0.6).delay(0.2), value: showContent)
                     }
                     .padding(.top, CalmDesignSystem.Spacing.xxxl)
                     
@@ -55,6 +60,8 @@ struct RitualSelectionView: View {
                         }
                     }
                     .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                    .opacity(showContent ? 1.0 : 0.0)
+                    .animation(.easeInOut(duration: 0.6).delay(0.4), value: showContent)
                     
                     Spacer()
                 }
@@ -65,6 +72,12 @@ struct RitualSelectionView: View {
             }
             .sheet(isPresented: $showSubscriptionPaywall) {
                 SubscriptionPaywallView()
+            }
+            .onAppear {
+                // Trigger fade-in animation
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    showContent = true
+                }
             }
         } else {
             // Fallback on earlier versions
