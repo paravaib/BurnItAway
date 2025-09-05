@@ -38,13 +38,13 @@ struct ParagraphDissolveView: View {
                                     Text(String(char))
                                         .font(.system(size: 26, weight: .regular, design: .rounded))
                                         .foregroundColor(charColor)
-                                        .opacity(charData.opacity)
-                                        .scaleEffect(charData.scale)
-                                        .blur(radius: charData.blur)
-                                        .offset(x: charData.offsetX, y: charData.offsetY)
-                                        .rotationEffect(.degrees(charData.rotation))
+                                        .opacity(charData.isDissolving ? charData.opacity : 1.0)
+                                        .scaleEffect(charData.isDissolving ? charData.scale : 1.0)
+                                        .blur(radius: charData.isDissolving ? charData.blur : 0.0)
+                                        .offset(x: charData.isDissolving ? charData.offsetX : 0.0, y: charData.isDissolving ? charData.offsetY : 0.0)
+                                        .rotationEffect(.degrees(charData.isDissolving ? charData.rotation : 0.0))
                                         .shadow(
-                                            color: charColor.opacity(charData.opacity * 0.5),
+                                            color: charColor.opacity(charData.isDissolving ? charData.opacity * 0.5 : 0.0),
                                             radius: charData.isDissolving ? 8 : 0
                                         )
                                         .animation(
@@ -52,6 +52,16 @@ struct ParagraphDissolveView: View {
                                             .delay(charData.dissolveDelay),
                                             value: charData.isDissolving
                                         )
+                                } else {
+                                    // Fallback for clean text display
+                                    Text(String(char))
+                                        .font(.system(size: 26, weight: .regular, design: .rounded))
+                                        .foregroundColor(charColor)
+                                        .opacity(1.0)
+                                        .scaleEffect(1.0)
+                                        .blur(radius: 0.0)
+                                        .offset(x: 0.0, y: 0.0)
+                                        .rotationEffect(.degrees(0.0))
                                 }
                             }
                         }
@@ -64,6 +74,7 @@ struct ParagraphDissolveView: View {
                 .opacity(showFullText ? 1.0 : 0.0)
                 .scaleEffect(showFullText ? 1.0 : 0.95)
                 .animation(.easeInOut(duration: 1.2), value: showFullText)
+                .allowsHitTesting(false)
             }
             
             Spacer()
