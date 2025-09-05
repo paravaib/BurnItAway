@@ -31,7 +31,7 @@ struct SubscriptionPaywallView: View {
                             .foregroundColor(CalmDesignSystem.Colors.textPrimary)
                     }
                     
-                    Text("Unlock unlimited worry burning")
+                    Text("Unlock unlimited worry release")
                         .font(CalmDesignSystem.Typography.subheadline)
                         .foregroundColor(CalmDesignSystem.Colors.textSecondary)
                         .multilineTextAlignment(.center)
@@ -44,8 +44,8 @@ struct SubscriptionPaywallView: View {
                 VStack(spacing: CalmDesignSystem.Spacing.lg) {
                     FeatureRow(
                         icon: "flame.fill",
-                        title: "Unlimited Burns",
-                        description: "Burn as many worries as you need, anytime"
+                        title: "Unlimited Rituals",
+                        description: "Release as many worries as you need, anytime"
                     )
                     
                     FeatureRow(
@@ -56,11 +56,15 @@ struct SubscriptionPaywallView: View {
                     
                     FeatureRow(
                         icon: "photo.fill",
-                        title: "Photo Burning",
-                        description: "Burn photos to symbolically release visual memories"
+                        title: "Photo Release",
+                        description: "Release photos to symbolically let go of visual memories"
                     )
                     
-
+                    FeatureRow(
+                        icon: "sparkles",
+                        title: "Multiple Rituals",
+                        description: "Choose from Burn, Smoke, Space, and Wash rituals"
+                    )
                     
                     FeatureRow(
                         icon: "heart.fill",
@@ -386,7 +390,7 @@ struct FallbackSubscriptionCard: View {
                         .allowsTightening(true)
                         .fixedSize(horizontal: false, vertical: true)
                     
-                    Text("Unlimited worry burning and premium features")
+                    Text("Unlimited worry release and premium features")
                         .font(CalmDesignSystem.Typography.body)
                         .foregroundColor(CalmDesignSystem.Colors.textSecondary)
                         .lineLimit(3)
