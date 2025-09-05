@@ -159,14 +159,9 @@ struct WorryInputView: View {
                 ritual: ritual,
                 text: worryText,
                 onComplete: {
-                    // Add a small delay for smooth transition
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        showRitualAnimation = false
-                        // Add another small delay before dismissing
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                            dismiss()
-                        }
-                    }
+                    // Direct dismissal without intermediate delays
+                    showRitualAnimation = false
+                    dismiss()
                 }
             )
             .ignoresSafeArea(.all)
@@ -223,7 +218,10 @@ struct WorryInputView: View {
                         progress: wellnessProgress,
                         onContinue: {
                             wellnessProgress.completeRitual(ritual)
-                            onComplete()
+                            // Add a small delay for smooth transition
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                                onComplete()
+                            }
                         }
                     )
                     .transition(.opacity.combined(with: .scale(scale: 0.95)))
