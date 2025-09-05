@@ -106,24 +106,26 @@ struct WorryInputView: View {
                     }
                     
                     // Symbolic message or limit warning
-                    if isOverLimit {
-                        Text("Please shorten your message to continue")
-                            .font(CalmDesignSystem.Typography.caption)
-                            .foregroundColor(CalmDesignSystem.Colors.error)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, CalmDesignSystem.Spacing.lg)
-                    } else if isNearLimit {
-                        Text("Almost at the limit - keep it concise for the best experience")
-                            .font(CalmDesignSystem.Typography.caption)
-                            .foregroundColor(CalmDesignSystem.Colors.warning)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, CalmDesignSystem.Spacing.lg)
-                    } else if !appState.canBurnWorry(isPremium: premium.isPremium) {
-                        Text("You've reached your daily limit of 7 rituals. Upgrade to Premium for unlimited rituals.")
-                            .font(CalmDesignSystem.Typography.caption)
-                            .foregroundColor(CalmDesignSystem.Colors.warning)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, CalmDesignSystem.Spacing.lg)
+                    Group {
+                        if isOverLimit {
+                            Text("Please shorten your message to continue")
+                                .font(CalmDesignSystem.Typography.caption)
+                                .foregroundColor(CalmDesignSystem.Colors.error)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, CalmDesignSystem.Spacing.lg)
+                        } else if isNearLimit {
+                            Text("Almost at the limit - keep it concise for the best experience")
+                                .font(CalmDesignSystem.Typography.caption)
+                                .foregroundColor(CalmDesignSystem.Colors.warning)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, CalmDesignSystem.Spacing.lg)
+                        } else if !appState.canBurnWorry(isPremium: premium.isPremium) {
+                            Text("You've reached your daily limit of 7 rituals. Upgrade to Premium for unlimited rituals.")
+                                .font(CalmDesignSystem.Typography.caption)
+                                .foregroundColor(CalmDesignSystem.Colors.warning)
+                                .multilineTextAlignment(.center)
+                                .padding(.horizontal, CalmDesignSystem.Spacing.lg)
+                        }
                     }
                     .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                     
