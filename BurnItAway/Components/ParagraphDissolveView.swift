@@ -71,8 +71,8 @@ struct ParagraphDissolveView: View {
                         .opacity(showFullText ? 1.0 : 0.0)
                         .scaleEffect(showFullText ? 1.0 : 0.9)
                         .animation(.easeInOut(duration: 1.5).delay(1.0), value: showFullText)
-                        .opacity(isDissolving ? 1.0 - dissolveProgress : 1.0)
-                        .blur(radius: isDissolving ? dissolveProgress * 3.0 : 0.0)
+                        .opacity(isDissolving ? 0.0 : 1.0)
+                        .blur(radius: isDissolving ? 3.0 : 0.0)
                         .allowsHitTesting(false)
                 }
             }
