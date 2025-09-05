@@ -255,12 +255,12 @@ struct PhotoBurnAnimation: View {
                 .accessibilityLabel("Burning memory")
                 .accessibilityValue("Progress: \(Int(controller.burnProgress * 100)) percent")
             
-            Text("Symbolic burning only - your photo is safe")
+            Text("Release the past. Embrace your future.")
                 .font(CalmDesignSystem.Typography.caption)
-                .foregroundColor(.white.opacity(0.7))
+                .foregroundColor(.white.opacity(0.8))
                 .multilineTextAlignment(.center)
-                .opacity(controller.burnProgress > 0.2 ? 0.8 : 0.0)
-                .accessibilityLabel("Symbolic burning only - your photo is safe")
+                .opacity(controller.burnProgress > 0.2 ? 1.0 : 0.0)
+                .accessibilityLabel("Release the past. Embrace your future.")
         }
         .animation(.easeInOut(duration: 1.0), value: controller.burnProgress)
     }
@@ -293,7 +293,7 @@ struct PhotoBurnAnimation: View {
                     .allowsTightening(true)
                     .accessibilityLabel("Memory released")
                 
-                Text("This was a symbolic burning experience. Your photo remains safe on your device.")
+                Text("You've taken a powerful step forward. Your courage is inspiring.")
                     .font(.system(size: 16))
                     .foregroundColor(CalmDesignSystem.Colors.textSecondary)
                     .multilineTextAlignment(.center)
@@ -301,7 +301,7 @@ struct PhotoBurnAnimation: View {
                     .minimumScaleFactor(0.6)
                     .allowsTightening(true)
                     .padding(.horizontal, 16)
-                    .accessibilityLabel("This was a symbolic burning experience. Your photo remains safe on your device.")
+                    .accessibilityLabel("You've taken a powerful step forward. Your courage is inspiring.")
             }
             .padding(.horizontal, 32)
             Spacer()

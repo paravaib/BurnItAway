@@ -134,7 +134,7 @@ struct PhotoPickerView: View {
                     .font(.headline)
                     .foregroundColor(.orange)
                 
-                Text("This memory will be symbolically burned with fire animation. Your photo will remain safe in your library.")
+                Text("Transform this memory into strength. You have the power to heal.")
                     .font(.body)
                 
                 Text("This is a therapeutic experience - no real deletion occurs.")

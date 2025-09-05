@@ -34,7 +34,7 @@ struct PhotoBurnView: View {
                         .allowsTightening(true)
                         .multilineTextAlignment(.center)
                     
-                    Text("Release visual memories with fire animation. Your photos remain safe.")
+                    Text("Transform painful memories into inner strength and peace.")
                         .font(CalmDesignSystem.Typography.subheadline)
                         .foregroundColor(CalmDesignSystem.Colors.textSecondary)
                         .multilineTextAlignment(.center)
@@ -89,7 +89,7 @@ struct PhotoBurnView: View {
                             FeatureRow(
                                 icon: "heart.fill",
                                 title: "Symbolic Release",
-                                description: "Photos remain safe while you symbolically release the memory"
+                                description: "Transform visual memories into emotional freedom"
                             )
                         }
                         .padding(.horizontal, CalmDesignSystem.Spacing.xl)
@@ -171,7 +171,7 @@ struct PhotoBurnView: View {
                                         .allowsTightening(true)
                                         .multilineTextAlignment(.center)
                                     
-                                    Text("This is a symbolic burning experience. Your photo will remain safe on your device.")
+                                    Text("This symbolic ritual helps you process and release difficult emotions.")
                                         .font(CalmDesignSystem.Typography.body)
                                         .foregroundColor(CalmDesignSystem.Colors.textSecondary)
                                         .multilineTextAlignment(.center)

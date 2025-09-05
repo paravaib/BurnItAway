@@ -401,11 +401,11 @@ struct RealAnimationContainer: View {
                             .opacity(textOpacity > 0.5 ? 1.0 : 0.0)
                             .animation(.easeInOut(duration: 1.0), value: textOpacity)
                         
-                        Text("Symbolic \(getRitualName()) only - your thoughts are safe")
+                        Text("You're stronger than your worries. Let them go.")
                             .font(CalmDesignSystem.Typography.caption)
-                            .foregroundColor(.white.opacity(0.6))
+                            .foregroundColor(.white.opacity(0.8))
                             .multilineTextAlignment(.center)
-                            .opacity(textOpacity > 0.4 ? 0.8 : 0.0)
+                            .opacity(textOpacity > 0.4 ? 1.0 : 0.0)
                             .animation(.easeInOut(duration: 1.0), value: textOpacity)
                     }
                     .padding(.bottom, CalmDesignSystem.Spacing.xxxl)
