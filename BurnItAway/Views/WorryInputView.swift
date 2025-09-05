@@ -14,6 +14,8 @@ struct WorryInputView: View {
     @State private var showRitualAnimation = false
     @State private var showingCelebration = false
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var appState: AppState
+    @EnvironmentObject var premium: PremiumState
     
     init(ritual: RitualType, onRitualCompleted: (() -> Void)? = nil) {
         self.ritual = ritual
@@ -116,6 +118,12 @@ struct WorryInputView: View {
                             .foregroundColor(CalmDesignSystem.Colors.warning)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, CalmDesignSystem.Spacing.lg)
+                    } else if !appState.canBurnWorry(isPremium: premium.isPremium) {
+                        Text("You've reached your daily limit of 7 rituals. Upgrade to Premium for unlimited rituals.")
+                            .font(CalmDesignSystem.Typography.caption)
+                            .foregroundColor(CalmDesignSystem.Colors.warning)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, CalmDesignSystem.Spacing.lg)
                     } else {
                         Text("This is a symbolic \(ritual.displayName.lowercased()) experience. Your thoughts remain safe.")
                             .font(CalmDesignSystem.Typography.caption)
@@ -133,6 +141,16 @@ struct WorryInputView: View {
                 VStack(spacing: CalmDesignSystem.Spacing.lg) {
                     Button("\(ritual.emoji) \(ritual.displayName) This Worry") {
                         if !worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isOverLimit {
+                            // Check if user can perform ritual
+                            guard appState.canBurnWorry(isPremium: premium.isPremium) else {
+                                HapticFeedback.error()
+                                return
+                            }
+                            
+                            // Store the worry and increment count
+                            appState.addWorry(worryText, category: "general")
+                            appState.incrementWorryCount()
+                            
                             HapticFeedback.medium()
                             showRitualAnimation = true
                         } else if isOverLimit {
@@ -140,7 +158,7 @@ struct WorryInputView: View {
                         }
                     }
                     .buttonStyle(CalmPrimaryButtonStyle(color: ritual.calmColor))
-                    .disabled(worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isOverLimit)
+                    .disabled(worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isOverLimit || !appState.canBurnWorry(isPremium: premium.isPremium))
                     .accessibilityLabel("\(ritual.displayName) this worry")
                     .accessibilityHint(isOverLimit ? "Text is too long. Please shorten your message." : "Double tap to start the \(ritual.displayName.lowercased()) ritual")
                     .accessibilityAddTraits(.isButton)
