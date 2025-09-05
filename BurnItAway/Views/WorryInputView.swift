@@ -13,7 +13,6 @@ struct WorryInputView: View {
     @State private var worryText = ""
     @State private var showRitualAnimation = false
     @State private var showingCelebration = false
-    @StateObject private var wellnessProgress = WellnessProgress()
     @Environment(\.dismiss) private var dismiss
     
     init(ritual: RitualType, onRitualCompleted: (() -> Void)? = nil) {
@@ -180,7 +179,6 @@ struct WorryInputView: View {
         let ritual: RitualType
         let text: String
         let onComplete: () -> Void
-        @StateObject private var wellnessProgress = WellnessProgress()
         @State private var showingCelebration = false
         
         var body: some View {
@@ -217,13 +215,35 @@ struct WorryInputView: View {
                 .opacity(showingCelebration ? 0.0 : 1.0)
                 .animation(.easeInOut(duration: 0.5), value: showingCelebration)
                 
-                // Celebration View (overlay)
+                // Simple completion message (overlay)
                 if showingCelebration {
-                    RitualCelebrationView(
-                        feedback: RitualCompletionFeedback.generateFeedback(for: wellnessProgress, ritual: ritual),
-                        progress: wellnessProgress,
-                        onContinue: {
-                            wellnessProgress.completeRitual(ritual)
+                    VStack(spacing: 30) {
+                        Spacer()
+                        
+                        VStack(spacing: 20) {
+                            Text("✨")
+                                .font(.system(size: 80))
+                                .scaleEffect(1.2)
+                                .animation(.spring(response: 0.6, dampingFraction: 0.6), value: showingCelebration)
+                            
+                            Text("It's released.")
+                                .font(.system(size: 36, weight: .light, design: .rounded))
+                                .foregroundColor(.white)
+                                .multilineTextAlignment(.center)
+                                .opacity(showingCelebration ? 1.0 : 0.0)
+                                .animation(.easeInOut(duration: 1.0).delay(0.5), value: showingCelebration)
+                            
+                            Text("Rest now.")
+                                .font(.system(size: 22, weight: .regular))
+                                .foregroundColor(.white.opacity(0.8))
+                                .multilineTextAlignment(.center)
+                                .opacity(showingCelebration ? 1.0 : 0.0)
+                                .animation(.easeInOut(duration: 1.0).delay(1.0), value: showingCelebration)
+                        }
+                        
+                        Spacer()
+                        
+                        Button("Continue") {
                             // Call the completion callback
                             onRitualCompleted?()
                             // Add a small delay for smooth transition
@@ -231,13 +251,17 @@ struct WorryInputView: View {
                                 onComplete()
                             }
                         }
-                    )
+                        .buttonStyle(CalmPrimaryButtonStyle(color: ritual.calmColor))
+                        .opacity(showingCelebration ? 1.0 : 0.0)
+                        .animation(.easeInOut(duration: 1.0).delay(2.0), value: showingCelebration)
+                        
+                        Spacer()
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.black.opacity(0.9))
                     .transition(.opacity.combined(with: .scale(scale: 0.95)))
                     .animation(.easeInOut(duration: 0.5), value: showingCelebration)
                 }
-            }
-            .onAppear {
-                wellnessProgress.loadProgress()
             }
         }
     }
