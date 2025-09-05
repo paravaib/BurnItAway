@@ -38,25 +38,27 @@ struct ParagraphDissolveView: View {
                     .opacity(showFullText ? 1.0 : 0.0)
                     .scaleEffect(showFullText ? 1.0 : 0.95)
                     .animation(.easeInOut(duration: 1.2), value: showFullText)
-                    .mask(
-                        // Mask for dissolve effect
-                        Rectangle()
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        Color.black,
-                                        Color.black.opacity(1.0 - dissolveProgress),
-                                        Color.clear
-                                    ],
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                )
-                            )
-                    )
-                    .blur(radius: isDissolving ? dissolveProgress * 3.0 : 0.0)
-                    .scaleEffect(isDissolving ? 1.0 - (dissolveProgress * 0.1) : 1.0)
-                    .offset(y: isDissolving ? dissolveProgress * 20.0 : 0.0)
+                    .opacity(isDissolving ? 1.0 - dissolveProgress : 1.0)
+                    .blur(radius: isDissolving ? dissolveProgress * 5.0 : 0.0)
+                    .scaleEffect(isDissolving ? 1.0 - (dissolveProgress * 0.3) : 1.0)
+                    .offset(y: isDissolving ? dissolveProgress * 30.0 : 0.0)
                     .allowsHitTesting(false)
+                
+                // Meditation text below
+                if showFullText {
+                    Text("Close your eyes and imagine it being removed")
+                        .font(.system(size: 16, weight: .light, design: .rounded))
+                        .foregroundColor(charColor.opacity(0.7))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                        .padding(.top, CalmDesignSystem.Spacing.lg)
+                        .opacity(showFullText ? 1.0 : 0.0)
+                        .scaleEffect(showFullText ? 1.0 : 0.9)
+                        .animation(.easeInOut(duration: 1.5).delay(1.0), value: showFullText)
+                        .opacity(isDissolving ? 1.0 - dissolveProgress : 1.0)
+                        .blur(radius: isDissolving ? dissolveProgress * 3.0 : 0.0)
+                        .allowsHitTesting(false)
+                }
             }
             
             Spacer()
