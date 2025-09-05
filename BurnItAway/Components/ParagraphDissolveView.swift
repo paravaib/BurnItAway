@@ -32,11 +32,12 @@ struct ParagraphDissolveView: View {
                 // Paragraph text with letter-by-letter dissolve
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(Array(createTextLines().enumerated()), id: \.offset) { lineIndex, line in
-                        HStack(alignment: .top, spacing: 0) {
+                        HStack(alignment: .top, spacing: 2) {
                             ForEach(Array(line.enumerated()), id: \.offset) { charIndex, char in
                                 if let charData = characters.first(where: { $0.lineIndex == lineIndex && $0.charIndex == charIndex }) {
                                     Text(String(char))
                                         .font(.system(size: 20, weight: .regular, design: .rounded))
+                                        .kerning(1.5)
                                         .foregroundColor(charColor)
                                         .opacity(charData.isDissolving ? charData.opacity : 1.0)
                                         .scaleEffect(charData.isDissolving ? charData.scale : 1.0)
@@ -56,6 +57,7 @@ struct ParagraphDissolveView: View {
                                     // Fallback for clean text display
                                     Text(String(char))
                                         .font(.system(size: 20, weight: .regular, design: .rounded))
+                                        .kerning(1.5)
                                         .foregroundColor(charColor)
                                         .opacity(1.0)
                                         .scaleEffect(1.0)
