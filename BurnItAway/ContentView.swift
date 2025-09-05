@@ -56,7 +56,10 @@ struct ContentView: View {
                             // Subtle floating particles around the button
                             FloatingParticles()
                             
-                            NavigationLink("Release Your Worry") { RitualSelectionView() }
+                            NavigationLink("Release Your Worry") { 
+                                RitualSelectionView()
+                                    .navigationBarBackButtonHidden(true)
+                            }
                                 .buttonStyle(CalmPrimaryButtonStyle())
                                 .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                                 .accessibilityLabel("Release your worry")
@@ -230,6 +233,9 @@ struct ContentView: View {
                 Task {
                     await premium.loadProducts()
                 }
+            }
+            .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("DismissToHome"))) { _ in
+                // Handle dismissal to home - this will be handled by the navigation system
             }
             .sheet(isPresented: $showSubscriptionPaywall) {
                 SubscriptionPaywallView()

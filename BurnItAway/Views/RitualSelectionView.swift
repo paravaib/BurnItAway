@@ -12,6 +12,8 @@ struct RitualSelectionView: View {
     @State private var selectedRitual: RitualType?
     @State private var showSubscriptionPaywall = false
     @State private var showContent = false
+    @State private var ritualCompleted = false
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         if #available(iOS 17.0, *) {
@@ -67,8 +69,18 @@ struct RitualSelectionView: View {
                 }
             }
             .navigationBarHidden(false)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Back") {
+                        dismiss()
+                    }
+                    .foregroundColor(CalmDesignSystem.Colors.textPrimary)
+                }
+            }
             .navigationDestination(item: $selectedRitual) { ritual in
-                WorryInputView(ritual: ritual)
+                WorryInputView(ritual: ritual, onRitualCompleted: {
+                    ritualCompleted = true
+                })
             }
             .sheet(isPresented: $showSubscriptionPaywall) {
                 SubscriptionPaywallView()
@@ -77,6 +89,14 @@ struct RitualSelectionView: View {
                 // Trigger fade-in animation
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     showContent = true
+                }
+            }
+            .onChange(of: ritualCompleted) { completed in
+                if completed {
+                    // Auto-dismiss back to ContentView after ritual completion
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        dismiss()
+                    }
                 }
             }
         } else {

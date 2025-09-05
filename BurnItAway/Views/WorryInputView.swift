@@ -9,11 +9,17 @@ import SwiftUI
 
 struct WorryInputView: View {
     let ritual: RitualType
+    let onRitualCompleted: (() -> Void)?
     @State private var worryText = ""
     @State private var showRitualAnimation = false
     @State private var showingCelebration = false
     @StateObject private var wellnessProgress = WellnessProgress()
     @Environment(\.dismiss) private var dismiss
+    
+    init(ritual: RitualType, onRitualCompleted: (() -> Void)? = nil) {
+        self.ritual = ritual
+        self.onRitualCompleted = onRitualCompleted
+    }
     
     // Character limit constants
     private let maxCharacters = 100
@@ -159,7 +165,7 @@ struct WorryInputView: View {
                 ritual: ritual,
                 text: worryText,
                 onComplete: {
-                    // Direct dismissal without intermediate delays
+                    // Dismiss back to RitualSelectionView
                     showRitualAnimation = false
                     dismiss()
                 }
@@ -218,6 +224,8 @@ struct WorryInputView: View {
                         progress: wellnessProgress,
                         onContinue: {
                             wellnessProgress.completeRitual(ritual)
+                            // Call the completion callback
+                            onRitualCompleted?()
                             // Add a small delay for smooth transition
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                                 onComplete()
