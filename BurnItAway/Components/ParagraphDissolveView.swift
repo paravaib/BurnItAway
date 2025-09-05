@@ -146,7 +146,7 @@ struct ParagraphDissolveView: View {
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                     withAnimation(.easeInOut(duration: dissolveDuration)) {
-                        dissolvingChars.insert("\(lineIndex)-\(charIndex)")
+                        _ = dissolvingChars.insert("\(lineIndex)-\(charIndex)")
                     }
                 }
             }
