@@ -124,14 +124,6 @@ struct WorryInputView: View {
                             .foregroundColor(CalmDesignSystem.Colors.warning)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, CalmDesignSystem.Spacing.lg)
-                    } else {
-                        Text("This is a symbolic \(ritual.displayName.lowercased()) experience. Your thoughts remain safe.")
-                            .font(CalmDesignSystem.Typography.caption)
-                            .foregroundColor(CalmDesignSystem.Colors.textSecondary)
-                            .multilineTextAlignment(.center)
-                            .opacity(0.8)
-                            .padding(.horizontal, CalmDesignSystem.Spacing.lg)
-                    }
                 }
                 .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                 
