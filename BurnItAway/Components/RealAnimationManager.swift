@@ -378,22 +378,15 @@ struct RealAnimationContainer: View {
                 }
             }
             
-            // Melting text overlay with realistic letter-by-letter melting
+            // Lyrics-style text display with word-by-word highlighting
             if !text.isEmpty {
-                VStack {
-                    Spacer()
-                    
-                    MeltingTextView(
-                        text: text,
-                        ritualType: getRitualType(),
-                        onComplete: {
-                            // Text melting complete, continue with video
-                        }
-                    )
-                    .frame(height: 100)
-                    
-                    Spacer()
-                }
+                LyricsStyleTextView(
+                    text: text,
+                    ritualType: getRitualType(),
+                    onComplete: {
+                        // Lyrics display complete, continue with video
+                    }
+                )
             }
             
             // Progress indicator
@@ -819,19 +812,12 @@ struct EnhancedRitualView: View {
     
     @ViewBuilder
     private var fallbackView: some View {
-        // Fallback to simple text animation if video fails
-        VStack {
-            Spacer()
-            
-            MeltingTextView(
-                text: text,
-                ritualType: ritualType,
-                onComplete: onComplete
-            )
-            .frame(height: 100)
-            
-            Spacer()
-        }
+        // Fallback to lyrics-style text animation if video fails
+        LyricsStyleTextView(
+            text: text,
+            ritualType: ritualType,
+            onComplete: onComplete
+        )
         .background(Color.black)
         .ignoresSafeArea()
     }
