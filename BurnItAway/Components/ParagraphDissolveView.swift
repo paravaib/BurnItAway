@@ -30,17 +30,37 @@ struct ParagraphDissolveView: View {
             
             // Full paragraph text display
             VStack(spacing: CalmDesignSystem.Spacing.md) {
-                // Simple text display - no character processing
-                Text(text)
-                    .font(.system(size: 20, weight: .regular, design: .rounded))
-                    .kerning(1.5)
-                    .foregroundColor(charColor)
-                    .multilineTextAlignment(.leading)
-                    .lineSpacing(6)
-                    .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                    .opacity(showFullText ? 1.0 : 0.0)
-                    .scaleEffect(showFullText ? 1.0 : 0.95)
-                    .animation(.easeInOut(duration: 1.2), value: showFullText)
+                // Paragraph text with letter-by-letter dissolve
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(Array(createTextLines().enumerated()), id: \.offset) { lineIndex, line in
+                        HStack(alignment: .top, spacing: 2) {
+                            ForEach(Array(line.enumerated()), id: \.offset) { charIndex, char in
+                                Text(String(char))
+                                    .font(.system(size: 20, weight: .regular, design: .rounded))
+                                    .kerning(1.5)
+                                    .foregroundColor(charColor)
+                                    .opacity(showFullText ? (dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? 0.0 : 1.0) : 0.0)
+                                    .scaleEffect(showFullText ? (dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? 0.1 : 1.0) : 1.0)
+                                    .blur(radius: dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? 5.0 : 0.0)
+                                    .offset(x: dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? Double.random(in: -30...30) : 0.0, 
+                                           y: dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? Double.random(in: -20...20) : 0.0)
+                                    .rotationEffect(.degrees(dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? Double.random(in: -25...25) : 0.0))
+                                    .shadow(
+                                        color: charColor.opacity(dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? 0.5 : 0.0),
+                                        radius: dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? 8 : 0
+                                    )
+                                    .animation(.easeInOut(duration: dissolveDuration), value: dissolvingChars.contains("\(lineIndex)-\(charIndex)"))
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .multilineTextAlignment(.leading)
+                .lineSpacing(6)
+                .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                .opacity(showFullText ? 1.0 : 0.0)
+                .scaleEffect(showFullText ? 1.0 : 0.95)
+                .animation(.easeInOut(duration: 1.2), value: showFullText)
                 .allowsHitTesting(false)
             }
             
@@ -119,17 +139,27 @@ struct ParagraphDissolveView: View {
     private func startDissolving() {
         isDissolving = true
         
-        // Simple fade out animation
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            withAnimation(.easeInOut(duration: 3.0)) {
-                showFullText = false
+        // Dissolve characters one by one sequentially across all lines
+        var charIndex = 0
+        for (lineIndex, line) in createTextLines().enumerated() {
+            for (charPos, _) in line.enumerated() {
+                let delay = Double(charIndex) * dissolveDelay
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    withAnimation(.easeInOut(duration: dissolveDuration)) {
+                        _ = dissolvingChars.insert("\(lineIndex)-\(charPos)")
+                    }
+                }
+                charIndex += 1
             }
-            
-            // Complete after fade out
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                allCharactersDissolved = true
-                onComplete()
-            }
+        }
+        
+        // Complete after all characters have started dissolving
+        let totalChars = createTextLines().flatMap { $0 }.count
+        let totalDissolveTime = Double(totalChars) * dissolveDelay + dissolveDuration
+        DispatchQueue.main.asyncAfter(deadline: .now() + totalDissolveTime) {
+            allCharactersDissolved = true
+            onComplete()
         }
     }
     
