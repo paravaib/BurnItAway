@@ -29,12 +29,6 @@ struct ParagraphDissolveView: View {
             
             // Full paragraph text display
             VStack(spacing: CalmDesignSystem.Spacing.md) {
-                Text("Your Worry")
-                    .font(CalmDesignSystem.Typography.headline)
-                    .foregroundColor(CalmDesignSystem.Colors.textSecondary)
-                    .opacity(showFullText ? 1.0 : 0.0)
-                    .animation(.easeInOut(duration: 0.8), value: showFullText)
-                
                 // Paragraph text with letter-by-letter dissolve
                 VStack(alignment: .leading, spacing: 0) {
                     ForEach(Array(createTextLines().enumerated()), id: \.offset) { lineIndex, line in
