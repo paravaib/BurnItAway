@@ -378,13 +378,13 @@ struct RealAnimationContainer: View {
                 }
             }
             
-            // Lyrics-style text display with word-by-word highlighting
+            // Paragraph dissolve text display
             if !text.isEmpty {
-                LyricsStyleTextView(
+                ParagraphDissolveView(
                     text: text,
                     ritualType: getRitualType(),
                     onComplete: {
-                        // Lyrics display complete, continue with video
+                        // Paragraph dissolve complete, continue with video
                     }
                 )
             }
@@ -812,8 +812,8 @@ struct EnhancedRitualView: View {
     
     @ViewBuilder
     private var fallbackView: some View {
-        // Fallback to lyrics-style text animation if video fails
-        LyricsStyleTextView(
+        // Fallback to paragraph dissolve animation if video fails
+        ParagraphDissolveView(
             text: text,
             ritualType: ritualType,
             onComplete: onComplete
