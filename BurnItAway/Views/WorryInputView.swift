@@ -78,9 +78,9 @@ struct WorryInputView: View {
                                     .overlay(
                                         RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
                                             .stroke(
-                                                isOverLimit ? CalmDesignSystem.Colors.error : 
-                                                isNearLimit ? CalmDesignSystem.Colors.warning : 
-                                                CalmDesignSystem.Colors.glassBorder, 
+                                                isOverLimit ? CalmDesignSystem.Colors.error :
+                                                    isNearLimit ? CalmDesignSystem.Colors.warning :
+                                                    CalmDesignSystem.Colors.glassBorder,
                                                 lineWidth: isOverLimit ? 2 : 1
                                             )
                                     )
@@ -96,8 +96,8 @@ struct WorryInputView: View {
                                 .font(CalmDesignSystem.Typography.caption)
                                 .foregroundColor(
                                     isOverLimit ? CalmDesignSystem.Colors.error :
-                                    isNearLimit ? CalmDesignSystem.Colors.warning :
-                                    CalmDesignSystem.Colors.textSecondary
+                                        isNearLimit ? CalmDesignSystem.Colors.warning :
+                                        CalmDesignSystem.Colors.textSecondary
                                 )
                                 .animation(.easeInOut(duration: 0.2), value: isOverLimit)
                                 .animation(.easeInOut(duration: 0.2), value: isNearLimit)
@@ -124,68 +124,68 @@ struct WorryInputView: View {
                             .foregroundColor(CalmDesignSystem.Colors.warning)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, CalmDesignSystem.Spacing.lg)
-                }
-                .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                
-                Spacer()
-                
-                // Action Buttons
-                VStack(spacing: CalmDesignSystem.Spacing.lg) {
-                    Button("\(ritual.emoji) \(ritual.displayName) This Worry") {
-                        if !worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isOverLimit {
-                            // Check if user can perform ritual
-                            guard appState.canBurnWorry(isPremium: premium.isPremium) else {
-                                HapticFeedback.error()
-                                return
-                            }
-                            
-                            // Store the worry and increment count
-                            appState.addWorry(worryText, category: "general")
-                            appState.incrementWorryCount()
-                            
-                            HapticFeedback.medium()
-                            showRitualAnimation = true
-                        } else if isOverLimit {
-                            HapticFeedback.error()
-                        }
                     }
-                    .buttonStyle(CalmPrimaryButtonStyle(color: ritual.calmColor))
-                    .disabled(worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isOverLimit || !appState.canBurnWorry(isPremium: premium.isPremium))
-                    .accessibilityLabel("\(ritual.displayName) this worry")
-                    .accessibilityHint(isOverLimit ? "Text is too long. Please shorten your message." : "Double tap to start the \(ritual.displayName.lowercased()) ritual")
-                    .accessibilityAddTraits(.isButton)
+                    .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                     
-                    Button("Back to Rituals") {
-                        HapticFeedback.light()
-                        dismiss()
+                    Spacer()
+                    
+                    // Action Buttons
+                    VStack(spacing: CalmDesignSystem.Spacing.lg) {
+                        Button("\(ritual.emoji) \(ritual.displayName) This Worry") {
+                            if !worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isOverLimit {
+                                // Check if user can perform ritual
+                                guard appState.canBurnWorry(isPremium: premium.isPremium) else {
+                                    HapticFeedback.error()
+                                    return
+                                }
+                                
+                                // Store the worry and increment count
+                                appState.addWorry(worryText, category: "general")
+                                appState.incrementWorryCount()
+                                
+                                HapticFeedback.medium()
+                                showRitualAnimation = true
+                            } else if isOverLimit {
+                                HapticFeedback.error()
+                            }
+                        }
+                        .buttonStyle(CalmPrimaryButtonStyle(color: ritual.calmColor))
+                        .disabled(worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isOverLimit || !appState.canBurnWorry(isPremium: premium.isPremium))
+                        .accessibilityLabel("\(ritual.displayName) this worry")
+                        .accessibilityHint(isOverLimit ? "Text is too long. Please shorten your message." : "Double tap to start the \(ritual.displayName.lowercased()) ritual")
+                        .accessibilityAddTraits(.isButton)
+                        
+                        Button("Back to Rituals") {
+                            HapticFeedback.light()
+                            dismiss()
+                        }
+                        .buttonStyle(CalmSecondaryButtonStyle())
+                        .accessibilityLabel("Back to ritual selection")
+                        .accessibilityHint("Double tap to return to ritual selection")
+                        .accessibilityAddTraits(.isButton)
                     }
-                    .buttonStyle(CalmSecondaryButtonStyle())
-                    .accessibilityLabel("Back to ritual selection")
-                    .accessibilityHint("Double tap to return to ritual selection")
-                    .accessibilityAddTraits(.isButton)
+                    .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                    .padding(.bottom, CalmDesignSystem.Spacing.xxxl)
                 }
-                .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                .padding(.bottom, CalmDesignSystem.Spacing.xxxl)
+            }
+            .navigationBarHidden(true)
+            .fullScreenCover(isPresented: $showRitualAnimation) {
+                RitualAnimationView(
+                    ritual: ritual,
+                    text: worryText,
+                    onComplete: {
+                        // Dismiss back to RitualSelectionView
+                        showRitualAnimation = false
+                        dismiss()
+                    },
+                    onRitualCompleted: onRitualCompleted
+                )
+                .ignoresSafeArea(.all)
             }
         }
-        .navigationBarHidden(true)
-        .fullScreenCover(isPresented: $showRitualAnimation) {
-            RitualAnimationView(
-                ritual: ritual,
-                text: worryText,
-                onComplete: {
-                    // Dismiss back to RitualSelectionView
-                    showRitualAnimation = false
-                    dismiss()
-                },
-                onRitualCompleted: onRitualCompleted
-            )
-            .ignoresSafeArea(.all)
-        }
     }
-}
-
-// Helper view to wrap different ritual animations
+    
+    // Helper view to wrap different ritual animations
     struct RitualAnimationView: View {
         let ritual: RitualType
         let text: String
@@ -284,9 +284,10 @@ struct WorryInputView: View {
             }
         }
     }
-
-#Preview {
-    NavigationStack {
-        WorryInputView(ritual: .burn)
+    
+    #Preview {
+        NavigationStack {
+            WorryInputView(ritual: .burn)
+        }
     }
 }
