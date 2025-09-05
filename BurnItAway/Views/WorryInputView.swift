@@ -167,7 +167,8 @@ struct WorryInputView: View {
                     // Dismiss back to RitualSelectionView
                     showRitualAnimation = false
                     dismiss()
-                }
+                },
+                onRitualCompleted: onRitualCompleted
             )
             .ignoresSafeArea(.all)
         }
@@ -179,7 +180,15 @@ struct WorryInputView: View {
         let ritual: RitualType
         let text: String
         let onComplete: () -> Void
+        let onRitualCompleted: (() -> Void)?
         @State private var showingCelebration = false
+        
+        init(ritual: RitualType, text: String, onComplete: @escaping () -> Void, onRitualCompleted: (() -> Void)? = nil) {
+            self.ritual = ritual
+            self.text = text
+            self.onComplete = onComplete
+            self.onRitualCompleted = onRitualCompleted
+        }
         
         var body: some View {
             ZStack {
