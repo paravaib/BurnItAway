@@ -36,7 +36,7 @@ struct ParagraphDissolveView: View {
                             ForEach(Array(line.enumerated()), id: \.offset) { charIndex, char in
                                 if let charData = characters.first(where: { $0.lineIndex == lineIndex && $0.charIndex == charIndex }) {
                                     Text(String(char))
-                                        .font(.system(size: 26, weight: .regular, design: .rounded))
+                                        .font(.system(size: 20, weight: .regular, design: .rounded))
                                         .foregroundColor(charColor)
                                         .opacity(charData.isDissolving ? charData.opacity : 1.0)
                                         .scaleEffect(charData.isDissolving ? charData.scale : 1.0)
@@ -55,7 +55,7 @@ struct ParagraphDissolveView: View {
                                 } else {
                                     // Fallback for clean text display
                                     Text(String(char))
-                                        .font(.system(size: 26, weight: .regular, design: .rounded))
+                                        .font(.system(size: 20, weight: .regular, design: .rounded))
                                         .foregroundColor(charColor)
                                         .opacity(1.0)
                                         .scaleEffect(1.0)
@@ -69,7 +69,7 @@ struct ParagraphDissolveView: View {
                     }
                 }
                 .multilineTextAlignment(.leading)
-                .lineSpacing(8)
+                .lineSpacing(6)
                 .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                 .opacity(showFullText ? 1.0 : 0.0)
                 .scaleEffect(showFullText ? 1.0 : 0.95)
@@ -116,8 +116,8 @@ struct ParagraphDissolveView: View {
         for word in words {
             let wordChars = Array(word)
             
-            // Check if adding this word would exceed line length (approximately 50 characters per line)
-            if currentLine.count + wordChars.count + 1 > 50 && !currentLine.isEmpty {
+            // Check if adding this word would exceed line length (approximately 60 characters per line for smaller font)
+            if currentLine.count + wordChars.count + 1 > 60 && !currentLine.isEmpty {
                 lines.append(currentLine)
                 currentLine = wordChars
             } else {
