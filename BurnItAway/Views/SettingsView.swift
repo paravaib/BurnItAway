@@ -19,7 +19,6 @@ struct SettingsView: View {
                     if !premium.isPremium {
                         DailyBurnSection()
                     }
-                    SoundSection()
                     AnimationSection()
                     ReminderSection(showSubscriptionPaywall: $showSubscriptionPaywall)
                     PsychologyNavigationSection()
@@ -102,26 +101,6 @@ struct PremiumSection: View {
     }
 }
 
-// MARK: - Sound Section
-struct SoundSection: View {
-    @EnvironmentObject var appState: AppState
-    
-    var body: some View {
-        Section(header: Text("Sound").foregroundColor(.white)) {
-            Toggle("Enable sound", isOn: $appState.soundOn)
-                .tint(.orange)
-            
-            HStack {
-                Text("Volume")
-                Slider(value: $appState.soundVolume, in: 0...1)
-            }
-            
-            Toggle("Haptics", isOn: $appState.hapticsOn)
-                .tint(.purple)
-        }
-        .listRowBackground(Color.white.opacity(0.06))
-    }
-}
 
 // MARK: - Animation Section
 struct AnimationSection: View {
