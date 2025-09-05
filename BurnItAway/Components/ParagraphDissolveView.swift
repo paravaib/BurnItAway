@@ -34,37 +34,24 @@ struct ParagraphDissolveView: View {
                     ForEach(Array(createTextLines().enumerated()), id: \.offset) { lineIndex, line in
                         HStack(alignment: .top, spacing: 2) {
                             ForEach(Array(line.enumerated()), id: \.offset) { charIndex, char in
-                                if let charData = characters.first(where: { $0.lineIndex == lineIndex && $0.charIndex == charIndex }) {
-                                    Text(String(char))
-                                        .font(.system(size: 20, weight: .regular, design: .rounded))
-                                        .kerning(1.5)
-                                        .foregroundColor(charColor)
-                                        .opacity(charData.isDissolving ? charData.opacity : 1.0)
-                                        .scaleEffect(charData.isDissolving ? charData.scale : 1.0)
-                                        .blur(radius: charData.isDissolving ? charData.blur : 0.0)
-                                        .offset(x: charData.isDissolving ? charData.offsetX : 0.0, y: charData.isDissolving ? charData.offsetY : 0.0)
-                                        .rotationEffect(.degrees(charData.isDissolving ? charData.rotation : 0.0))
-                                        .shadow(
-                                            color: charColor.opacity(charData.isDissolving ? charData.opacity * 0.5 : 0.0),
-                                            radius: charData.isDissolving ? 8 : 0
-                                        )
-                                        .animation(
-                                            .easeInOut(duration: dissolveDuration)
-                                            .delay(charData.dissolveDelay),
-                                            value: charData.isDissolving
-                                        )
-                                } else {
-                                    // Fallback for clean text display
-                                    Text(String(char))
-                                        .font(.system(size: 20, weight: .regular, design: .rounded))
-                                        .kerning(1.5)
-                                        .foregroundColor(charColor)
-                                        .opacity(1.0)
-                                        .scaleEffect(1.0)
-                                        .blur(radius: 0.0)
-                                        .offset(x: 0.0, y: 0.0)
-                                        .rotationEffect(.degrees(0.0))
-                                }
+                                Text(String(char))
+                                    .font(.system(size: 20, weight: .regular, design: .rounded))
+                                    .kerning(1.5)
+                                    .foregroundColor(charColor)
+                                    .opacity(getCharOpacity(lineIndex: lineIndex, charIndex: charIndex))
+                                    .scaleEffect(getCharScale(lineIndex: lineIndex, charIndex: charIndex))
+                                    .blur(radius: getCharBlur(lineIndex: lineIndex, charIndex: charIndex))
+                                    .offset(x: getCharOffsetX(lineIndex: lineIndex, charIndex: charIndex), y: getCharOffsetY(lineIndex: lineIndex, charIndex: charIndex))
+                                    .rotationEffect(.degrees(getCharRotation(lineIndex: lineIndex, charIndex: charIndex)))
+                                    .shadow(
+                                        color: charColor.opacity(getCharOpacity(lineIndex: lineIndex, charIndex: charIndex) * 0.5),
+                                        radius: getCharIsDissolving(lineIndex: lineIndex, charIndex: charIndex) ? 8 : 0
+                                    )
+                                    .animation(
+                                        .easeInOut(duration: dissolveDuration)
+                                        .delay(getCharDissolveDelay(lineIndex: lineIndex, charIndex: charIndex)),
+                                        value: getCharIsDissolving(lineIndex: lineIndex, charIndex: charIndex)
+                                    )
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -118,8 +105,8 @@ struct ParagraphDissolveView: View {
         for word in words {
             let wordChars = Array(word)
             
-            // Check if adding this word would exceed line length (approximately 60 characters per line for smaller font)
-            if currentLine.count + wordChars.count + 1 > 60 && !currentLine.isEmpty {
+            // Check if adding this word would exceed line length (approximately 40 characters per line for better wrapping)
+            if currentLine.count + wordChars.count + 1 > 40 && !currentLine.isEmpty {
                 lines.append(currentLine)
                 currentLine = wordChars
             } else {
@@ -177,6 +164,51 @@ struct ParagraphDissolveView: View {
             allCharactersDissolved = true
             onComplete()
         }
+    }
+    
+    // MARK: - Character Property Helpers
+    private func getCharData(lineIndex: Int, charIndex: Int) -> DissolveCharacter? {
+        return characters.first(where: { $0.lineIndex == lineIndex && $0.charIndex == charIndex })
+    }
+    
+    private func getCharOpacity(lineIndex: Int, charIndex: Int) -> Double {
+        guard let charData = getCharData(lineIndex: lineIndex, charIndex: charIndex) else { return 1.0 }
+        return charData.isDissolving ? charData.opacity : 1.0
+    }
+    
+    private func getCharScale(lineIndex: Int, charIndex: Int) -> CGFloat {
+        guard let charData = getCharData(lineIndex: lineIndex, charIndex: charIndex) else { return 1.0 }
+        return charData.isDissolving ? charData.scale : 1.0
+    }
+    
+    private func getCharBlur(lineIndex: Int, charIndex: Int) -> CGFloat {
+        guard let charData = getCharData(lineIndex: lineIndex, charIndex: charIndex) else { return 0.0 }
+        return charData.isDissolving ? charData.blur : 0.0
+    }
+    
+    private func getCharOffsetX(lineIndex: Int, charIndex: Int) -> Double {
+        guard let charData = getCharData(lineIndex: lineIndex, charIndex: charIndex) else { return 0.0 }
+        return charData.isDissolving ? charData.offsetX : 0.0
+    }
+    
+    private func getCharOffsetY(lineIndex: Int, charIndex: Int) -> Double {
+        guard let charData = getCharData(lineIndex: lineIndex, charIndex: charIndex) else { return 0.0 }
+        return charData.isDissolving ? charData.offsetY : 0.0
+    }
+    
+    private func getCharRotation(lineIndex: Int, charIndex: Int) -> Double {
+        guard let charData = getCharData(lineIndex: lineIndex, charIndex: charIndex) else { return 0.0 }
+        return charData.isDissolving ? charData.rotation : 0.0
+    }
+    
+    private func getCharIsDissolving(lineIndex: Int, charIndex: Int) -> Bool {
+        guard let charData = getCharData(lineIndex: lineIndex, charIndex: charIndex) else { return false }
+        return charData.isDissolving
+    }
+    
+    private func getCharDissolveDelay(lineIndex: Int, charIndex: Int) -> Double {
+        guard let charData = getCharData(lineIndex: lineIndex, charIndex: charIndex) else { return 0.0 }
+        return charData.dissolveDelay
     }
     
     private var charColor: Color {
