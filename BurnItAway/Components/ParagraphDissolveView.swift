@@ -17,6 +17,7 @@ struct ParagraphDissolveView: View {
     @State private var isDissolving = false
     @State private var currentCharIndex = 0
     @State private var allCharactersDissolved = false
+    @State private var dissolvingChars: Set<String> = []
     
     // Animation timing
     private let showDuration: Double = 4.0 // Show full text for 4 seconds
@@ -38,20 +39,17 @@ struct ParagraphDissolveView: View {
                                     .font(.system(size: 20, weight: .regular, design: .rounded))
                                     .kerning(1.5)
                                     .foregroundColor(charColor)
-                                    .opacity(getCharOpacity(lineIndex: lineIndex, charIndex: charIndex))
-                                    .scaleEffect(getCharScale(lineIndex: lineIndex, charIndex: charIndex))
-                                    .blur(radius: getCharBlur(lineIndex: lineIndex, charIndex: charIndex))
-                                    .offset(x: getCharOffsetX(lineIndex: lineIndex, charIndex: charIndex), y: getCharOffsetY(lineIndex: lineIndex, charIndex: charIndex))
-                                    .rotationEffect(.degrees(getCharRotation(lineIndex: lineIndex, charIndex: charIndex)))
+                                    .opacity(showFullText ? (dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? 0.0 : 1.0) : 0.0)
+                                    .scaleEffect(showFullText ? (dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? 0.1 : 1.0) : 1.0)
+                                    .blur(radius: dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? 5.0 : 0.0)
+                                    .offset(x: dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? Double.random(in: -30...30) : 0.0, 
+                                           y: dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? Double.random(in: -20...20) : 0.0)
+                                    .rotationEffect(.degrees(dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? Double.random(in: -25...25) : 0.0))
                                     .shadow(
-                                        color: charColor.opacity(getCharOpacity(lineIndex: lineIndex, charIndex: charIndex) * 0.5),
-                                        radius: getCharIsDissolving(lineIndex: lineIndex, charIndex: charIndex) ? 8 : 0
+                                        color: charColor.opacity(dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? 0.5 : 0.0),
+                                        radius: dissolvingChars.contains("\(lineIndex)-\(charIndex)") ? 8 : 0
                                     )
-                                    .animation(
-                                        .easeInOut(duration: dissolveDuration)
-                                        .delay(getCharDissolveDelay(lineIndex: lineIndex, charIndex: charIndex)),
-                                        value: getCharIsDissolving(lineIndex: lineIndex, charIndex: charIndex)
-                                    )
+                                    .animation(.easeInOut(duration: dissolveDuration), value: dissolvingChars.contains("\(lineIndex)-\(charIndex)"))
                             }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -142,24 +140,21 @@ struct ParagraphDissolveView: View {
         isDissolving = true
         
         // Dissolve characters one by one
-        for (index, character) in characters.enumerated() {
-            let delay = Double(index) * dissolveDelay
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
-                withAnimation(.easeInOut(duration: dissolveDuration)) {
-                    characters[index].isDissolving = true
-                    characters[index].opacity = 0.0
-                    characters[index].scale = 0.1
-                    characters[index].blur = 5.0
-                    characters[index].offsetX = Double.random(in: -30...30)
-                    characters[index].offsetY = Double.random(in: -20...20)
-                    characters[index].rotation = Double.random(in: -25...25)
+        for (lineIndex, line) in createTextLines().enumerated() {
+            for (charIndex, _) in line.enumerated() {
+                let delay = Double(lineIndex * 100 + charIndex) * dissolveDelay
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+                    withAnimation(.easeInOut(duration: dissolveDuration)) {
+                        dissolvingChars.insert("\(lineIndex)-\(charIndex)")
+                    }
                 }
             }
         }
         
         // Complete after all characters have started dissolving
-        let totalDissolveTime = Double(characters.count) * dissolveDelay + dissolveDuration
+        let totalChars = createTextLines().flatMap { $0 }.count
+        let totalDissolveTime = Double(totalChars) * dissolveDelay + dissolveDuration
         DispatchQueue.main.asyncAfter(deadline: .now() + totalDissolveTime) {
             allCharactersDissolved = true
             onComplete()
