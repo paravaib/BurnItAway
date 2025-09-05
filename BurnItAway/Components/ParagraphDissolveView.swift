@@ -139,16 +139,18 @@ struct ParagraphDissolveView: View {
     private func startDissolving() {
         isDissolving = true
         
-        // Dissolve characters one by one
+        // Dissolve characters one by one sequentially across all lines
+        var charIndex = 0
         for (lineIndex, line) in createTextLines().enumerated() {
-            for (charIndex, _) in line.enumerated() {
-                let delay = Double(lineIndex * 100 + charIndex) * dissolveDelay
+            for (charPos, _) in line.enumerated() {
+                let delay = Double(charIndex) * dissolveDelay
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
                     withAnimation(.easeInOut(duration: dissolveDuration)) {
-                        _ = dissolvingChars.insert("\(lineIndex)-\(charIndex)")
+                        _ = dissolvingChars.insert("\(lineIndex)-\(charPos)")
                     }
                 }
+                charIndex += 1
             }
         }
         
