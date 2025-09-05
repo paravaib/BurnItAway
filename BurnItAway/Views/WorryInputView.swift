@@ -16,12 +16,12 @@ struct WorryInputView: View {
     @Environment(\.dismiss) private var dismiss
     
     // Character limit constants
-    private let maxCharacters = 200
+    private let maxCharacters = 100
     private var remainingCharacters: Int {
         maxCharacters - worryText.count
     }
     private var isNearLimit: Bool {
-        remainingCharacters <= 20
+        remainingCharacters <= 15
     }
     private var isOverLimit: Bool {
         remainingCharacters < 0

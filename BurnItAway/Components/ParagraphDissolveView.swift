@@ -36,25 +36,32 @@ struct ParagraphDissolveView: View {
                     .animation(.easeInOut(duration: 0.8), value: showFullText)
                 
                 // Paragraph text with letter-by-letter dissolve
-                HStack(alignment: .top, spacing: 0) {
-                    ForEach(characters) { char in
-                        Text(String(char.character))
-                            .font(.system(size: 26, weight: .regular, design: .rounded))
-                            .foregroundColor(charColor)
-                            .opacity(char.opacity)
-                            .scaleEffect(char.scale)
-                            .blur(radius: char.blur)
-                            .offset(x: char.offsetX, y: char.offsetY)
-                            .rotationEffect(.degrees(char.rotation))
-                            .shadow(
-                                color: charColor.opacity(char.opacity * 0.5),
-                                radius: char.isDissolving ? 8 : 0
-                            )
-                            .animation(
-                                .easeInOut(duration: dissolveDuration)
-                                .delay(char.dissolveDelay),
-                                value: char.isDissolving
-                            )
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(Array(createTextLines().enumerated()), id: \.offset) { lineIndex, line in
+                        HStack(alignment: .top, spacing: 0) {
+                            ForEach(Array(line.enumerated()), id: \.offset) { charIndex, char in
+                                if let charData = characters.first(where: { $0.lineIndex == lineIndex && $0.charIndex == charIndex }) {
+                                    Text(String(char))
+                                        .font(.system(size: 26, weight: .regular, design: .rounded))
+                                        .foregroundColor(charColor)
+                                        .opacity(charData.opacity)
+                                        .scaleEffect(charData.scale)
+                                        .blur(radius: charData.blur)
+                                        .offset(x: charData.offsetX, y: charData.offsetY)
+                                        .rotationEffect(.degrees(charData.rotation))
+                                        .shadow(
+                                            color: charColor.opacity(charData.opacity * 0.5),
+                                            radius: charData.isDissolving ? 8 : 0
+                                        )
+                                        .animation(
+                                            .easeInOut(duration: dissolveDuration)
+                                            .delay(charData.dissolveDelay),
+                                            value: charData.isDissolving
+                                        )
+                                }
+                            }
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
                 .multilineTextAlignment(.leading)
@@ -74,19 +81,53 @@ struct ParagraphDissolveView: View {
     }
     
     private func setupCharacters() {
-        characters = text.map { char in
-            DissolveCharacter(
-                character: char,
-                opacity: 1.0,
-                scale: 1.0,
-                blur: 0.0,
-                offsetX: 0.0,
-                offsetY: 0.0,
-                rotation: 0.0,
-                isDissolving: false,
-                dissolveDelay: 0.0
-            )
+        let lines = createTextLines()
+        characters = []
+        
+        for (lineIndex, line) in lines.enumerated() {
+            for (charIndex, char) in line.enumerated() {
+                characters.append(DissolveCharacter(
+                    character: char,
+                    lineIndex: lineIndex,
+                    charIndex: charIndex,
+                    opacity: 1.0,
+                    scale: 1.0,
+                    blur: 0.0,
+                    offsetX: 0.0,
+                    offsetY: 0.0,
+                    rotation: 0.0,
+                    isDissolving: false,
+                    dissolveDelay: 0.0
+                ))
+            }
         }
+    }
+    
+    private func createTextLines() -> [[Character]] {
+        let words = text.components(separatedBy: .whitespaces)
+        var lines: [[Character]] = []
+        var currentLine: [Character] = []
+        
+        for word in words {
+            let wordChars = Array(word)
+            
+            // Check if adding this word would exceed line length (approximately 50 characters per line)
+            if currentLine.count + wordChars.count + 1 > 50 && !currentLine.isEmpty {
+                lines.append(currentLine)
+                currentLine = wordChars
+            } else {
+                if !currentLine.isEmpty {
+                    currentLine.append(" ") // Add space between words
+                }
+                currentLine.append(contentsOf: wordChars)
+            }
+        }
+        
+        if !currentLine.isEmpty {
+            lines.append(currentLine)
+        }
+        
+        return lines
     }
     
     private func startAnimation() {
@@ -107,7 +148,7 @@ struct ParagraphDissolveView: View {
         isDissolving = true
         
         // Dissolve characters one by one
-        for (index, _) in characters.enumerated() {
+        for (index, character) in characters.enumerated() {
             let delay = Double(index) * dissolveDelay
             
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
@@ -151,6 +192,8 @@ struct ParagraphDissolveView: View {
 struct DissolveCharacter: Identifiable {
     let id = UUID()
     let character: Character
+    let lineIndex: Int
+    let charIndex: Int
     var opacity: Double
     var scale: CGFloat
     var blur: CGFloat
@@ -159,6 +202,20 @@ struct DissolveCharacter: Identifiable {
     var rotation: Double
     var isDissolving: Bool
     var dissolveDelay: Double
+    
+    init(character: Character, lineIndex: Int, charIndex: Int, opacity: Double = 1.0, scale: CGFloat = 1.0, blur: CGFloat = 0.0, offsetX: Double = 0.0, offsetY: Double = 0.0, rotation: Double = 0.0, isDissolving: Bool = false, dissolveDelay: Double = 0.0) {
+        self.character = character
+        self.lineIndex = lineIndex
+        self.charIndex = charIndex
+        self.opacity = opacity
+        self.scale = scale
+        self.blur = blur
+        self.offsetX = offsetX
+        self.offsetY = offsetY
+        self.rotation = rotation
+        self.isDissolving = isDissolving
+        self.dissolveDelay = dissolveDelay
+    }
 }
 
 // MARK: - Preview
