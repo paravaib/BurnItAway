@@ -8,22 +8,22 @@ struct OnboardingView: View {
         OnboardingPage(
             icon: "flame.fill",
             title: "Welcome to BurnItAway",
-            subtitle: "Release your worries through fire",
-            description: "A therapeutic app that helps you let go of anxiety and stress through a calming fire ritual.",
+            subtitle: "Release your worries symbolically",
+            description: "A therapeutic app that helps you let go of anxiety and stress through calming symbolic rituals.",
             color: CalmDesignSystem.Colors.primary
         ),
         OnboardingPage(
             icon: "brain.head.profile",
             title: "The Science of Release",
             subtitle: "Based on proven psychology",
-            description: "Writing down worries and watching them burn creates powerful psychological release and helps you externalize your concerns.",
+            description: "Writing down worries and watching them dissolve creates powerful psychological release and helps you externalize your concerns.",
             color: CalmDesignSystem.Colors.secondary
         ),
         OnboardingPage(
             icon: "hand.tap.fill",
             title: "How It Works",
             subtitle: "Simple and effective",
-            description: "1. Write your worry\n2. Watch it burn away\n3. Feel the release\n4. Rest and reflect",
+            description: "1. Choose your ritual\n2. Write your worry\n3. Watch it dissolve\n4. Feel the release",
             color: CalmDesignSystem.Colors.accent
         ),
         OnboardingPage(
