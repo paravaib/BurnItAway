@@ -15,6 +15,18 @@ struct WorryInputView: View {
     @StateObject private var wellnessProgress = WellnessProgress()
     @Environment(\.dismiss) private var dismiss
     
+    // Character limit constants
+    private let maxCharacters = 200
+    private var remainingCharacters: Int {
+        maxCharacters - worryText.count
+    }
+    private var isNearLimit: Bool {
+        remainingCharacters <= 20
+    }
+    private var isOverLimit: Bool {
+        remainingCharacters < 0
+    }
+    
     var body: some View {
         CalmBackground {
             VStack(spacing: CalmDesignSystem.Spacing.xxl) {
@@ -48,29 +60,65 @@ struct WorryInputView: View {
                         .foregroundColor(CalmDesignSystem.Colors.textPrimary)
                         .multilineTextAlignment(.center)
                     
-                    TextField("Type your worry here...", text: $worryText, axis: .vertical)
-                        .font(CalmDesignSystem.Typography.body)
-                        .foregroundColor(CalmDesignSystem.Colors.textPrimary)
-                        .padding(CalmDesignSystem.Spacing.lg)
-                        .background(
-                            RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
-                                .fill(CalmDesignSystem.Colors.surface)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
-                                        .stroke(CalmDesignSystem.Colors.glassBorder, lineWidth: 1)
+                    VStack(spacing: CalmDesignSystem.Spacing.sm) {
+                        TextField("Type your worry here...", text: $worryText, axis: .vertical)
+                            .font(CalmDesignSystem.Typography.body)
+                            .foregroundColor(CalmDesignSystem.Colors.textPrimary)
+                            .padding(CalmDesignSystem.Spacing.lg)
+                            .background(
+                                RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
+                                    .fill(CalmDesignSystem.Colors.surface)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
+                                            .stroke(
+                                                isOverLimit ? CalmDesignSystem.Colors.error : 
+                                                isNearLimit ? CalmDesignSystem.Colors.warning : 
+                                                CalmDesignSystem.Colors.glassBorder, 
+                                                lineWidth: isOverLimit ? 2 : 1
+                                            )
+                                    )
+                            )
+                            .lineLimit(3...6)
+                            .accessibilityLabel("Text input for your worry")
+                            .accessibilityHint("Type the worry or thought you want to release")
+                        
+                        // Character counter
+                        HStack {
+                            Spacer()
+                            Text("\(worryText.count)/\(maxCharacters)")
+                                .font(CalmDesignSystem.Typography.caption)
+                                .foregroundColor(
+                                    isOverLimit ? CalmDesignSystem.Colors.error :
+                                    isNearLimit ? CalmDesignSystem.Colors.warning :
+                                    CalmDesignSystem.Colors.textSecondary
                                 )
-                        )
-                        .lineLimit(3...6)
-                        .accessibilityLabel("Text input for your worry")
-                        .accessibilityHint("Type the worry or thought you want to release")
+                                .animation(.easeInOut(duration: 0.2), value: isOverLimit)
+                                .animation(.easeInOut(duration: 0.2), value: isNearLimit)
+                        }
+                        .padding(.horizontal, CalmDesignSystem.Spacing.sm)
+                    }
                     
-                    // Symbolic message
-                    Text("This is a symbolic \(ritual.displayName.lowercased()) experience. Your thoughts remain safe.")
-                        .font(CalmDesignSystem.Typography.caption)
-                        .foregroundColor(CalmDesignSystem.Colors.textSecondary)
-                        .multilineTextAlignment(.center)
-                        .opacity(0.8)
-                        .padding(.horizontal, CalmDesignSystem.Spacing.lg)
+                    // Symbolic message or limit warning
+                    if isOverLimit {
+                        Text("Please shorten your message to continue")
+                            .font(CalmDesignSystem.Typography.caption)
+                            .foregroundColor(CalmDesignSystem.Colors.error)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, CalmDesignSystem.Spacing.lg)
+                    } else if isNearLimit {
+                        Text("Almost at the limit - keep it concise for the best experience")
+                            .font(CalmDesignSystem.Typography.caption)
+                            .foregroundColor(CalmDesignSystem.Colors.warning)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, CalmDesignSystem.Spacing.lg)
+                    } else {
+                        Text("This is a symbolic \(ritual.displayName.lowercased()) experience. Your thoughts remain safe.")
+                            .font(CalmDesignSystem.Typography.caption)
+                            .foregroundColor(CalmDesignSystem.Colors.textSecondary)
+                            .multilineTextAlignment(.center)
+                            .opacity(0.8)
+                            .padding(.horizontal, CalmDesignSystem.Spacing.lg)
+                    }
                 }
                 .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                 
@@ -79,15 +127,17 @@ struct WorryInputView: View {
                 // Action Buttons
                 VStack(spacing: CalmDesignSystem.Spacing.lg) {
                     Button("\(ritual.emoji) \(ritual.displayName) This Worry") {
-                        if !worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                        if !worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isOverLimit {
                             HapticFeedback.medium()
                             showRitualAnimation = true
+                        } else if isOverLimit {
+                            HapticFeedback.error()
                         }
                     }
                     .buttonStyle(CalmPrimaryButtonStyle(color: ritual.calmColor))
-                    .disabled(worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                    .disabled(worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isOverLimit)
                     .accessibilityLabel("\(ritual.displayName) this worry")
-                    .accessibilityHint("Double tap to start the \(ritual.displayName.lowercased()) ritual")
+                    .accessibilityHint(isOverLimit ? "Text is too long. Please shorten your message." : "Double tap to start the \(ritual.displayName.lowercased()) ritual")
                     .accessibilityAddTraits(.isButton)
                     
                     Button("Back to Rituals") {
