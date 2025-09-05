@@ -34,19 +34,19 @@ struct CalmBurnAnimationView: View {
                     .transition(.opacity.combined(with: .scale))
             }
             
-            // Heat distortion effect
-            if showHeatDistortion {
-                HeatDistortionView(isActive: showHeatDistortion, intensity: fireIntensity)
-                    .ignoresSafeArea()
-                    .transition(.opacity)
-            }
-            
-            // Full-screen fire animation
+            // Simple fire background effect
             if showFire {
-                AdvancedFireView(isActive: showFire, intensity: fireIntensity)
-                    .frame(width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height)
-                    .ignoresSafeArea()
-                    .transition(.opacity.combined(with: .scale))
+                LinearGradient(
+                    colors: [
+                        Color.orange.opacity(fireIntensity * 0.8),
+                        Color.red.opacity(fireIntensity * 0.6),
+                        Color.black
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .ignoresSafeArea()
+                .transition(.opacity.combined(with: .scale))
             }
             
             // Burning text

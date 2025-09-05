@@ -819,18 +819,21 @@ struct EnhancedRitualView: View {
     
     @ViewBuilder
     private var fallbackView: some View {
-        switch ritualType {
-        case "burn":
-            CalmBurnAnimationView(worryText: text, onComplete: onComplete)
-        case "smoke":
-            SmokeAnimation(text: text, onComplete: onComplete)
-        case "space":
-            SpaceAnimation(text: text, onComplete: onComplete)
-        case "wash":
-            WashAnimation(text: text, onComplete: onComplete)
-        default:
-            CalmBurnAnimationView(worryText: text, onComplete: onComplete)
+        // Fallback to simple text animation if video fails
+        VStack {
+            Spacer()
+            
+            MeltingTextView(
+                text: text,
+                ritualType: ritualType,
+                onComplete: onComplete
+            )
+            .frame(height: 100)
+            
+            Spacer()
         }
+        .background(Color.black)
+        .ignoresSafeArea()
     }
     
     private func loadRealAnimation() {
