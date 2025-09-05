@@ -148,7 +148,7 @@ struct ContentView: View {
                     
                     Spacer()
                     
-                    // Help, Progress, and Settings buttons
+                                            // Help, Progress, and Settings buttons
                     HStack(spacing: CalmDesignSystem.Spacing.lg) {
                         // Help button
                         NavigationLink {
@@ -168,6 +168,34 @@ struct ContentView: View {
                         
                         Spacer()
                         
+                        // Premium button (always visible for reviewers)
+                        if !premium.isPremium {
+                            Button(action: {
+                                HapticFeedback.light()
+                                showSubscriptionPaywall = true
+                            }) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "crown.fill")
+                                        .font(.system(size: 14, weight: .medium))
+                                    Text("Premium")
+                                        .font(CalmDesignSystem.Typography.caption)
+                                        .fontWeight(.medium)
+                                }
+                                .foregroundColor(CalmDesignSystem.Colors.primary)
+                                .padding(.horizontal, CalmDesignSystem.Spacing.md)
+                                .padding(.vertical, CalmDesignSystem.Spacing.sm)
+                                .background(
+                                    RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.md)
+                                        .fill(CalmDesignSystem.Colors.primary.opacity(0.1))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.md)
+                                                .stroke(CalmDesignSystem.Colors.primary.opacity(0.3), lineWidth: 1)
+                                        )
+                                )
+                            }
+                            .accessibilityLabel("Upgrade to Premium")
+                            .accessibilityHint("Double tap to view premium subscription options")
+                        }
                         
                         Spacer()
                         
