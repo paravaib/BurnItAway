@@ -224,35 +224,13 @@ struct SubscriptionPaywallView: View {
                     
                     // Terms and Privacy
                     VStack(spacing: CalmDesignSystem.Spacing.xs) {
-                        HStack(spacing: 4) {
-                            Text("By subscribing, you agree to our")
-                                .font(CalmDesignSystem.Typography.caption)
-                                .foregroundColor(CalmDesignSystem.Colors.textTertiary)
-                            
-                            Button("Terms of Use") {
-                                if let url = URL(string: "https://burnitaway.app/terms-of-use.html") {
-                                    UIApplication.shared.open(url)
-                                }
-                            }
+                        Text("By subscribing, you agree to our Terms of Service and Privacy Policy")
                             .font(CalmDesignSystem.Typography.caption)
-                            .foregroundColor(CalmDesignSystem.Colors.primary)
-                            
-                            Text("and")
-                                .font(CalmDesignSystem.Typography.caption)
-                                .foregroundColor(CalmDesignSystem.Colors.textTertiary)
-                            
-                            Button("Privacy Policy") {
-                                if let url = URL(string: "https://burnitaway.app/privacy-policy.html") {
-                                    UIApplication.shared.open(url)
-                                }
-                            }
-                            .font(CalmDesignSystem.Typography.caption)
-                            .foregroundColor(CalmDesignSystem.Colors.primary)
-                        }
-                        .multilineTextAlignment(.center)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.8)
-                        .allowsTightening(true)
+                            .foregroundColor(CalmDesignSystem.Colors.textTertiary)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
+                            .allowsTightening(true)
                         
                         Text("Cancel anytime in Settings")
                             .font(CalmDesignSystem.Typography.caption)
