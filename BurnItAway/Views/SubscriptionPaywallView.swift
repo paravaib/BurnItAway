@@ -96,56 +96,57 @@ struct SubscriptionPaywallView: View {
                 
                 // Action Buttons
                 VStack(spacing: CalmDesignSystem.Spacing.md) {
-                    if let product = subscriptionManager.products.first {
-                        Button(action: {
+                    // Always show purchase button - use fallback if products don't load
+                    Button(action: {
+                        if let product = subscriptionManager.products.first {
                             Task {
                                 await purchaseSubscription(product.product)
                             }
-                        }) {
-                            HStack {
-                                if isPurchasing {
-                                    ProgressView()
-                                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                        .scaleEffect(0.8)
-                                } else {
+                        } else {
+                            // Show error and retry loading
+                            errorMessage = "Unable to load subscription options. Please check your internet connection and try again."
+                            showError = true
+                            Task {
+                                await subscriptionManager.loadProducts()
+                            }
+                        }
+                    }) {
+                        HStack {
+                            if isPurchasing {
+                                ProgressView()
+                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    .scaleEffect(0.8)
+                            } else {
+                                if let product = subscriptionManager.products.first {
                                     Text(hasFreeTrial(product.product) ? "Start Free Trial" : "Subscribe")
+                                        .font(CalmDesignSystem.Typography.button)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.8)
+                                        .allowsTightening(true)
+                                } else {
+                                    Text("Subscribe - $2.99/month")
                                         .font(CalmDesignSystem.Typography.button)
                                         .lineLimit(1)
                                         .minimumScaleFactor(0.8)
                                         .allowsTightening(true)
                                 }
                             }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, CalmDesignSystem.Spacing.md)
-                            .background(
-                                RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [CalmDesignSystem.Colors.primary, CalmDesignSystem.Colors.primary.opacity(0.8)],
-                                            startPoint: .topLeading,
-                                            endPoint: .bottomTrailing
-                                        )
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, CalmDesignSystem.Spacing.md)
+                        .background(
+                            RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
+                                .fill(
+                                    LinearGradient(
+                                        colors: [CalmDesignSystem.Colors.primary, CalmDesignSystem.Colors.primary.opacity(0.8)],
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
                                     )
-                            )
-                        }
-                        .buttonStyle(CalmPrimaryButtonStyle())
-                        .disabled(isPurchasing)
-                    } else {
-                        // Fallback button when products don't load
-                        Button(action: {
-                            // Retry loading products
-                            Task {
-                                await subscriptionManager.loadProducts()
-                            }
-                        }) {
-                            Text("Retry Loading")
-                                .font(CalmDesignSystem.Typography.button)
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.8)
-                                .allowsTightening(true)
-                        }
-                        .buttonStyle(CalmPrimaryButtonStyle())
+                                )
+                        )
                     }
+                    .buttonStyle(CalmPrimaryButtonStyle())
+                    .disabled(isPurchasing)
                     
                     Button(action: {
                         Task {
@@ -212,12 +213,17 @@ struct SubscriptionPaywallView: View {
     private func purchaseSubscription(_ product: Product) async {
         isPurchasing = true
         
-        let success = await subscriptionManager.purchase(product)
-        
-        if success {
-            dismiss()
-        } else if let error = subscriptionManager.errorMessage {
-            errorMessage = error
+        do {
+            let success = await subscriptionManager.purchase(product)
+            
+            if success {
+                dismiss()
+            } else if let error = subscriptionManager.errorMessage {
+                errorMessage = error
+                showError = true
+            }
+        } catch {
+            errorMessage = "Purchase failed: \(error.localizedDescription)"
             showError = true
         }
         
@@ -241,6 +247,11 @@ struct SubscriptionPaywallView: View {
     }
     
     private func openSubscriptionManagement() {
+        // Check if we're in a test environment first
+        #if DEBUG
+        print("🔥 DEBUG: Attempting to open subscription management")
+        #endif
+        
         Task {
             do {
                 guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
@@ -249,11 +260,16 @@ struct SubscriptionPaywallView: View {
                     showError = true
                     return
                 }
+                
+                // Try to open subscription management
                 try await AppStore.showManageSubscriptions(in: windowScene)
+                print("🔥 Successfully opened subscription management")
+                
             } catch {
                 print("🔥 Failed to open subscription management: \(error)")
-                // Fallback: Show alert with instructions
-                errorMessage = "Please go to Settings > Apple ID > Subscriptions to manage your subscription."
+                
+                // Show detailed error message
+                errorMessage = "Unable to open subscription management. Please go to Settings > Apple ID > Subscriptions to manage your subscription."
                 showError = true
             }
         }

@@ -48,23 +48,44 @@ class SubscriptionManager: ObservableObject {
         errorMessage = nil
         
         do {
+            print("🔥 Attempting to load products with IDs: \(productIDs)")
             let storeProducts = try await Product.products(for: productIDs)
             
-            products = storeProducts.map { product in
-                SubscriptionProduct(
-                    id: product.id,
-                    displayName: product.displayName,
-                    description: product.description,
-                    price: product.displayPrice,
-                    period: getPeriodString(for: product),
-                    product: product
-                )
+            if storeProducts.isEmpty {
+                print("🔥 No products returned from App Store")
+                errorMessage = "No subscription products available. Please check your internet connection."
+            } else {
+                products = storeProducts.map { product in
+                    SubscriptionProduct(
+                        id: product.id,
+                        displayName: product.displayName,
+                        description: product.description,
+                        price: product.displayPrice,
+                        period: getPeriodString(for: product),
+                        product: product
+                    )
+                }
+                
+                print("🔥 Successfully loaded \(products.count) subscription products")
+                for product in products {
+                    print("🔥 Product: \(product.displayName) - \(product.price)")
+                }
             }
-            
-            print("🔥 Loaded \(products.count) subscription products")
         } catch {
             errorMessage = "Failed to load products: \(error.localizedDescription)"
             print("🔥 Error loading products: \(error)")
+            
+            // Try to provide more specific error messages
+            if let storeError = error as? StoreKitError {
+                switch storeError {
+                case .networkError:
+                    errorMessage = "Network error. Please check your internet connection and try again."
+                case .systemError:
+                    errorMessage = "System error. Please restart the app and try again."
+                default:
+                    errorMessage = "Unable to load subscription options. Please try again later."
+                }
+            }
         }
         
         isLoading = false
