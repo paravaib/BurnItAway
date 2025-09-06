@@ -111,6 +111,29 @@ struct SubscriptionPaywallView: View {
                             FallbackSubscriptionCard()
                         }
                     }
+                    
+                    // Required subscription information display (Apple requirement)
+                    VStack(spacing: CalmDesignSystem.Spacing.sm) {
+                        Text("Subscription Information")
+                            .font(CalmDesignSystem.Typography.headline)
+                            .foregroundColor(CalmDesignSystem.Colors.textPrimary)
+                        
+                        VStack(alignment: .leading, spacing: CalmDesignSystem.Spacing.xs) {
+                            Text("• Title: Premium Monthly")
+                            Text("• Duration: 1 month")
+                            Text("• Price: $2.99 USD per month")
+                            Text("• Auto-renewable: Yes")
+                            Text("• Free Trial: 7 days")
+                        }
+                        .font(CalmDesignSystem.Typography.caption)
+                        .foregroundColor(CalmDesignSystem.Colors.textSecondary)
+                        .multilineTextAlignment(.leading)
+                    }
+                    .padding(CalmDesignSystem.Spacing.md)
+                    .background(
+                        RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.md)
+                            .fill(CalmDesignSystem.Colors.surface.opacity(0.5))
+                    )
                 }
                 .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                 
@@ -118,11 +141,16 @@ struct SubscriptionPaywallView: View {
                 VStack(spacing: CalmDesignSystem.Spacing.md) {
                     // Always show purchase button - use fallback if products don't load
                     Button(action: {
+                        print("🔥 Purchase button tapped")
+                        HapticFeedback.medium()
+                        
                         if let product = subscriptionManager.products.first {
+                            print("🔥 Product found: \(product.displayName)")
                             Task {
                                 await purchaseSubscription(product.product)
                             }
                         } else {
+                            print("🔥 No product found, showing error")
                             // Show error and retry loading
                             errorMessage = "Unable to load subscription options. Please check your internet connection and try again."
                             showError = true
@@ -196,13 +224,35 @@ struct SubscriptionPaywallView: View {
                     
                     // Terms and Privacy
                     VStack(spacing: CalmDesignSystem.Spacing.xs) {
-                        Text("By subscribing, you agree to our Terms of Service and Privacy Policy")
+                        HStack(spacing: 4) {
+                            Text("By subscribing, you agree to our")
+                                .font(CalmDesignSystem.Typography.caption)
+                                .foregroundColor(CalmDesignSystem.Colors.textTertiary)
+                            
+                            Button("Terms of Use") {
+                                if let url = URL(string: "https://burnitaway.app/terms-of-use.html") {
+                                    UIApplication.shared.open(url)
+                                }
+                            }
                             .font(CalmDesignSystem.Typography.caption)
-                            .foregroundColor(CalmDesignSystem.Colors.textTertiary)
-                            .multilineTextAlignment(.center)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.8)
-                            .allowsTightening(true)
+                            .foregroundColor(CalmDesignSystem.Colors.primary)
+                            
+                            Text("and")
+                                .font(CalmDesignSystem.Typography.caption)
+                                .foregroundColor(CalmDesignSystem.Colors.textTertiary)
+                            
+                            Button("Privacy Policy") {
+                                if let url = URL(string: "https://burnitaway.app/privacy-policy.html") {
+                                    UIApplication.shared.open(url)
+                                }
+                            }
+                            .font(CalmDesignSystem.Typography.caption)
+                            .foregroundColor(CalmDesignSystem.Colors.primary)
+                        }
+                        .multilineTextAlignment(.center)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+                        .allowsTightening(true)
                         
                         Text("Cancel anytime in Settings")
                             .font(CalmDesignSystem.Typography.caption)
