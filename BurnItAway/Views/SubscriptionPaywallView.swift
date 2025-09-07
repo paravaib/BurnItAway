@@ -141,16 +141,13 @@ struct SubscriptionPaywallView: View {
                 VStack(spacing: CalmDesignSystem.Spacing.md) {
                     // Always show purchase button - use fallback if products don't load
                     Button(action: {
-                        print("🔥 Purchase button tapped")
                         HapticFeedback.medium()
                         
                         if let product = subscriptionManager.products.first {
-                            print("🔥 Product found: \(product.displayName)")
                             Task {
                                 await purchaseSubscription(product.product)
                             }
                         } else {
-                            print("🔥 No product found, showing error")
                             // Show error and retry loading
                             errorMessage = "Unable to load subscription options. Please check your internet connection and try again."
                             showError = true
@@ -251,15 +248,6 @@ struct SubscriptionPaywallView: View {
                 await subscriptionManager.loadProducts()
             }
         }
-        .onAppear {
-            // Log for debugging
-            print("🔥 SubscriptionPaywallView appeared")
-            print("🔥 Products count: \(subscriptionManager.products.count)")
-            print("🔥 Is loading: \(subscriptionManager.isLoading)")
-            if let error = subscriptionManager.errorMessage {
-                print("🔥 Error message: \(error)")
-            }
-        }
         .alert("Error", isPresented: $showError) {
             Button("OK") { }
         } message: {
@@ -304,15 +292,9 @@ struct SubscriptionPaywallView: View {
     }
     
     private func openSubscriptionManagement() {
-        // Check if we're in a test environment first
-        #if DEBUG
-        print("🔥 DEBUG: Attempting to open subscription management")
-        #endif
-        
         Task {
             do {
                 guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
-                    print("🔥 No window scene available")
                     errorMessage = "Please go to Settings > Apple ID > Subscriptions to manage your subscription."
                     showError = true
                     return
@@ -320,11 +302,8 @@ struct SubscriptionPaywallView: View {
                 
                 // Try to open subscription management
                 try await AppStore.showManageSubscriptions(in: windowScene)
-                print("🔥 Successfully opened subscription management")
                 
             } catch {
-                print("🔥 Failed to open subscription management: \(error)")
-                
                 // Show detailed error message
                 errorMessage = "Unable to open subscription management. Please go to Settings > Apple ID > Subscriptions to manage your subscription."
                 showError = true

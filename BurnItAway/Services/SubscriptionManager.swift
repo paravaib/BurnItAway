@@ -48,11 +48,9 @@ class SubscriptionManager: ObservableObject {
         errorMessage = nil
         
         do {
-            print("🔥 Attempting to load products with IDs: \(productIDs)")
             let storeProducts = try await Product.products(for: productIDs)
             
             if storeProducts.isEmpty {
-                print("🔥 No products returned from App Store")
                 errorMessage = "No subscription products available. Please check your internet connection."
             } else {
                 products = storeProducts.map { product in
@@ -65,15 +63,9 @@ class SubscriptionManager: ObservableObject {
                         product: product
                     )
                 }
-                
-                print("🔥 Successfully loaded \(products.count) subscription products")
-                for product in products {
-                    print("🔥 Product: \(product.displayName) - \(product.price)")
-                }
             }
         } catch {
             errorMessage = "Failed to load products: \(error.localizedDescription)"
-            print("🔥 Error loading products: \(error)")
             
             // Try to provide more specific error messages
             if let storeError = error as? StoreKitError {
@@ -151,24 +143,19 @@ class SubscriptionManager: ObservableObject {
                 await updatePurchasedSubscriptions()
                 await transaction.finish()
                 
-                print("🔥 Purchase successful: \(product.id)")
                 return true
                 
             case .userCancelled:
-                print("🔥 Purchase cancelled by user")
                 return false
                 
             case .pending:
-                print("🔥 Purchase pending")
                 return false
                 
             @unknown default:
-                print("🔥 Unknown purchase result")
                 return false
             }
         } catch {
             errorMessage = "Purchase failed: \(error.localizedDescription)"
-            print("🔥 Purchase error: \(error)")
             return false
         }
         
@@ -185,11 +172,9 @@ class SubscriptionManager: ObservableObject {
             await updatePurchasedSubscriptions()
             
             let hasActiveSubscription = !purchasedSubscriptions.isEmpty
-            print("🔥 Restore completed. Has active subscription: \(hasActiveSubscription)")
             return hasActiveSubscription
         } catch {
             errorMessage = "Restore failed: \(error.localizedDescription)"
-            print("🔥 Restore error: \(error)")
             return false
         }
         
@@ -208,12 +193,11 @@ class SubscriptionManager: ObservableObject {
                     validSubscriptions.append(product)
                 }
             } catch {
-                print("🔥 Failed to verify transaction: \(error)")
+                // Transaction verification failed - skip this transaction
             }
         }
         
         purchasedSubscriptions = validSubscriptions
-        print("🔥 Updated purchased subscriptions: \(purchasedSubscriptions.count) active")
     }
     
     func hasActiveSubscription() -> Bool {
@@ -269,7 +253,7 @@ class SubscriptionManager: ObservableObject {
                     await updatePurchasedSubscriptions()
                     await transaction.finish()
                 } catch {
-                    print("🔥 Transaction update error: \(error)")
+                    // Transaction update error - continue processing
                 }
             }
         }
