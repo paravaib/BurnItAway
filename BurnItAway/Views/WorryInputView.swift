@@ -301,12 +301,8 @@ struct WorryInputView: View {
                         Spacer()
                         
                         Button("Continue") {
-                            // Call the completion callback
-                            onRitualCompleted?()
-                            // Add a small delay for smooth transition
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-                                onComplete()
-                            }
+                            // Just dismiss back to RitualSelectionView
+                            onComplete()
                         }
                         .buttonStyle(CalmPrimaryButtonStyle(color: ritual.calmColor))
                         .opacity(showingCelebration ? 1.0 : 0.0)
