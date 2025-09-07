@@ -192,20 +192,12 @@ struct WorryInputView: View {
                             .accessibilityAddTraits(.isButton)
                         }
                         
-                        Button("Back to Rituals") {
-                            HapticFeedback.light()
-                            dismiss()
-                        }
-                        .buttonStyle(CalmSecondaryButtonStyle())
-                        .accessibilityLabel("Back to ritual selection")
-                        .accessibilityHint("Double tap to return to ritual selection")
-                        .accessibilityAddTraits(.isButton)
                     }
                     .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                     .padding(.bottom, CalmDesignSystem.Spacing.xxxl)
                 }
             }
-            .navigationBarHidden(true)
+            .navigationBarBackButtonHidden(false)
             .fullScreenCover(isPresented: $showRitualAnimation) {
                 RitualAnimationView(
                     ritual: ritual,
