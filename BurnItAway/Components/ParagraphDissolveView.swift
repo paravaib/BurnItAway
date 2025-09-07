@@ -60,21 +60,6 @@ struct ParagraphDissolveView: View {
                 .animation(.easeInOut(duration: 1.2), value: showFullText)
                     .allowsHitTesting(false)
                 
-                // Meditation text below
-                if showFullText {
-                    Text("Close your eyes and imagine it being removed")
-                        .font(.system(size: 16, weight: .light, design: .rounded))
-                        .foregroundColor(charColor.opacity(0.7))
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                        .padding(.top, CalmDesignSystem.Spacing.lg)
-                        .opacity(showFullText ? 1.0 : 0.0)
-                        .scaleEffect(showFullText ? 1.0 : 0.9)
-                        .animation(.easeInOut(duration: 1.5).delay(1.0), value: showFullText)
-                        .opacity(isDissolving ? 0.0 : 1.0)
-                        .blur(radius: isDissolving ? 3.0 : 0.0)
-                        .allowsHitTesting(false)
-                }
             }
             
             Spacer()
