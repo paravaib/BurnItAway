@@ -57,7 +57,6 @@ struct ContentView: View {
                             
                             NavigationLink("Release Your Worry") { 
                                 RitualSelectionView()
-                                    .navigationBarBackButtonHidden(true)
                             }
                                 .buttonStyle(CalmPrimaryButtonStyle())
                                 .padding(.horizontal, CalmDesignSystem.Spacing.xl)

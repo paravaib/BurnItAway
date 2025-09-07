@@ -100,15 +100,7 @@ struct RitualSelectionView: View {
                     Spacer()
                 }
             }
-            .navigationBarHidden(false)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Back") {
-                        dismiss()
-                    }
-                    .foregroundColor(CalmDesignSystem.Colors.textPrimary)
-                }
-            }
+            .navigationBarBackButtonHidden(false)
             .navigationDestination(item: $selectedRitual) { ritual in
                 WorryInputView(ritual: ritual, onRitualCompleted: {
                     ritualCompleted = true
