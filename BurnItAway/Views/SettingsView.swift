@@ -19,7 +19,6 @@ struct SettingsView: View {
                     if !premium.isPremium {
                         DailyBurnSection()
                     }
-                    AnimationSection()
                     ReminderSection(showSubscriptionPaywall: $showSubscriptionPaywall)
                     PsychologyNavigationSection()
                 }
@@ -101,20 +100,6 @@ struct PremiumSection: View {
     }
 }
 
-
-// MARK: - Animation Section
-struct AnimationSection: View {
-    var body: some View {
-        Section(header: Text("Burn animation").foregroundColor(.white)) {
-            HStack {
-                Text("Fire").foregroundColor(.white)
-                Spacer()
-                Image(systemName: "flame.fill").foregroundColor(.orange)
-            }
-        }
-        .listRowBackground(Color.white.opacity(0.06))
-    }
-}
 
 // MARK: - Reminder Section
 struct ReminderSection: View {
