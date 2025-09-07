@@ -58,7 +58,7 @@ struct PremiumSection: View {
                             Image(systemName: "checkmark.seal.fill").foregroundColor(.yellow)
                             Text("You have Premium").foregroundColor(.white)
                         }
-                        Text("Unlimited Burns + Photo Burning")
+                        Text("Unlimited Rituals + Photo Release")
                             .font(CalmDesignSystem.Typography.caption)
                             .foregroundColor(CalmDesignSystem.Colors.textTertiary)
                             .opacity(0.8)

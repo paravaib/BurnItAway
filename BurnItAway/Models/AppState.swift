@@ -130,7 +130,7 @@ final class AppState: ObservableObject {
     
     func canBurnWorry(isPremium: Bool) -> Bool {
         if isPremium {
-            return true // Premium users have unlimited burns
+            return true // Premium users have unlimited rituals
         }
         
         // Check if it's a new day and reset count

@@ -167,7 +167,7 @@ struct EnhancedBurnView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .multilineTextAlignment(.leading)
                 
-                Text("Upgrade to Premium for unlimited burns and continue your healing journey.")
+                Text("Upgrade to Premium for unlimited rituals and continue your healing journey.")
                     .font(CalmDesignSystem.Typography.callout)
                     .foregroundColor(CalmDesignSystem.Colors.textSecondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -180,7 +180,7 @@ struct EnhancedBurnView: View {
             }
             .buttonStyle(CalmPrimaryButtonStyle(color: CalmDesignSystem.Colors.success))
             .accessibilityLabel("Upgrade to premium")
-            .accessibilityHint("Double tap to upgrade to premium for unlimited burns")
+            .accessibilityHint("Double tap to upgrade to premium for unlimited rituals")
             .accessibilityAddTraits(.isButton)
         }
         .padding(CalmDesignSystem.Spacing.lg)

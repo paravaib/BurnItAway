@@ -52,7 +52,7 @@ struct HelpAboutView: View {
                         HelpSection(
                             icon: "crown.fill",
                             title: "Premium Features",
-                            content: "• Unlimited Burns: No daily limits on worry burning\n\n• Photo Burning: Symbolically release visual memories by burning photos\n\n• Enhanced Experience: Priority support and advanced features"
+                            content: "• Unlimited Rituals: No daily limits on worry release\n\n• Multiple Rituals: Choose from Burn, Smoke, Space, and Wash rituals\n\n• Photo Release: Symbolically release visual memories by transforming photos\n\n• Enhanced Experience: Priority support and advanced features"
                         )
                         
                         // Tips for Best Results

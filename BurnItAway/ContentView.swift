@@ -134,7 +134,7 @@ struct ContentView: View {
                                             .font(CalmDesignSystem.Typography.callout)
                                             .fontWeight(.medium)
                                             .foregroundColor(CalmDesignSystem.Colors.textSecondary)
-                                        Text("Unlimited Burns + Photo Burning")
+                                        Text("Unlimited Rituals + Photo Release")
                                             .font(CalmDesignSystem.Typography.caption)
                                             .foregroundColor(CalmDesignSystem.Colors.textSecondary)
                                             .opacity(0.8)
