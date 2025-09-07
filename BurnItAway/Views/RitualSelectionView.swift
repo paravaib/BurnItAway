@@ -21,47 +21,46 @@ struct RitualSelectionView: View {
                 VStack(spacing: CalmDesignSystem.Spacing.xxl) {
                     // Header
                     VStack(spacing: CalmDesignSystem.Spacing.lg) {
-                        HStack {
-                            Text("Choose Your Ritual")
-                                .font(CalmDesignSystem.Typography.largeTitle)
-                                .foregroundColor(CalmDesignSystem.Colors.textPrimary)
-                                .lineLimit(2)
-                                .minimumScaleFactor(0.8)
-                                .allowsTightening(true)
-                                .multilineTextAlignment(.center)
-                            
-                            Spacer()
-                            
-                            // Premium button for reviewers
-                            if !premium.isPremium {
-                                Button(action: {
-                                    showSubscriptionPaywall = true
-                                }) {
-                                    HStack(spacing: 4) {
-                                        Image(systemName: "crown.fill")
-                                            .font(.system(size: 12, weight: .medium))
-                                        Text("Premium")
-                                            .font(CalmDesignSystem.Typography.caption)
-                                            .fontWeight(.medium)
-                                    }
-                                    .foregroundColor(CalmDesignSystem.Colors.primary)
-                                    .padding(.horizontal, CalmDesignSystem.Spacing.sm)
-                                    .padding(.vertical, CalmDesignSystem.Spacing.xs)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.sm)
-                                            .fill(CalmDesignSystem.Colors.primary.opacity(0.1))
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.sm)
-                                                    .stroke(CalmDesignSystem.Colors.primary.opacity(0.3), lineWidth: 1)
-                                            )
-                                    )
+                        // Centered title
+                        Text("Choose Your Ritual")
+                            .font(CalmDesignSystem.Typography.largeTitle)
+                            .foregroundColor(CalmDesignSystem.Colors.textPrimary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
+                            .allowsTightening(true)
+                            .multilineTextAlignment(.center)
+                            .opacity(showContent ? 1.0 : 0.0)
+                            .animation(.easeInOut(duration: 0.6).delay(0.1), value: showContent)
+                        
+                        // Premium button below title
+                        if !premium.isPremium {
+                            Button(action: {
+                                showSubscriptionPaywall = true
+                            }) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "crown.fill")
+                                        .font(.system(size: 12, weight: .medium))
+                                    Text("Premium")
+                                        .font(CalmDesignSystem.Typography.caption)
+                                        .fontWeight(.medium)
                                 }
-                                .accessibilityLabel("Upgrade to Premium")
-                                .accessibilityHint("Double tap to view premium subscription options")
+                                .foregroundColor(CalmDesignSystem.Colors.primary)
+                                .padding(.horizontal, CalmDesignSystem.Spacing.sm)
+                                .padding(.vertical, CalmDesignSystem.Spacing.xs)
+                                .background(
+                                    RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.sm)
+                                        .fill(CalmDesignSystem.Colors.primary.opacity(0.1))
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.sm)
+                                                .stroke(CalmDesignSystem.Colors.primary.opacity(0.3), lineWidth: 1)
+                                        )
+                                )
                             }
+                            .accessibilityLabel("Upgrade to Premium")
+                            .accessibilityHint("Double tap to view premium subscription options")
+                            .opacity(showContent ? 1.0 : 0.0)
+                            .animation(.easeInOut(duration: 0.6).delay(0.2), value: showContent)
                         }
-                        .opacity(showContent ? 1.0 : 0.0)
-                        .animation(.easeInOut(duration: 0.6), value: showContent)
                         
                         Text("Select how you'd like to symbolically release your worry")
                             .font(CalmDesignSystem.Typography.subheadline)
