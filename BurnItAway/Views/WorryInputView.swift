@@ -13,6 +13,7 @@ struct WorryInputView: View {
     @State private var worryText = ""
     @State private var showRitualAnimation = false
     @State private var showingCelebration = false
+    @State private var showSubscriptionPaywall = false
     @Environment(\.dismiss) private var dismiss
     @EnvironmentObject var appState: AppState
     @EnvironmentObject var premium: PremiumState
@@ -95,7 +96,8 @@ struct WorryInputView: View {
                                     .multilineTextAlignment(.center)
                                 
                                 Button("Upgrade to Premium for Unlimited") {
-                                    // This will be handled by the parent view
+                                    HapticFeedback.medium()
+                                    showSubscriptionPaywall = true
                                 }
                                 .buttonStyle(CalmPrimaryButtonStyle(color: CalmDesignSystem.Colors.primary))
                                 .accessibilityLabel("Upgrade to Premium")
@@ -214,6 +216,9 @@ struct WorryInputView: View {
                     onRitualCompleted: onRitualCompleted
                 )
                 .ignoresSafeArea(.all)
+            }
+            .sheet(isPresented: $showSubscriptionPaywall) {
+                SubscriptionPaywallView()
             }
         }
     }
