@@ -197,6 +197,10 @@ struct WorryInputView: View {
                     .padding(.bottom, CalmDesignSystem.Spacing.xxxl)
                 }
             }
+            .onTapGesture {
+                // Dismiss keyboard when tapping outside text field
+                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            }
             .navigationBarBackButtonHidden(false)
             .fullScreenCover(isPresented: $showRitualAnimation) {
                 RitualAnimationView(
