@@ -89,27 +89,7 @@ struct SubscriptionPaywallView: View {
                         SubscriptionCard(product: product)
                     } else {
                         // Show fallback pricing if products don't load
-                        VStack(spacing: CalmDesignSystem.Spacing.md) {
-                            Text("⚠️ Subscription Loading Issue")
-                                .font(CalmDesignSystem.Typography.headline)
-                                .foregroundColor(CalmDesignSystem.Colors.warning)
-                            
-                            Text("Unable to load subscription options. This may be because:")
-                                .font(CalmDesignSystem.Typography.body)
-                                .foregroundColor(CalmDesignSystem.Colors.textSecondary)
-                                .multilineTextAlignment(.center)
-                            
-                            VStack(alignment: .leading, spacing: CalmDesignSystem.Spacing.sm) {
-                                Text("• App is not yet approved for sale")
-                                Text("• Subscription not configured in App Store Connect")
-                                Text("• Network connectivity issues")
-                                Text("• Product ID mismatch")
-                            }
-                            .font(CalmDesignSystem.Typography.caption)
-                            .foregroundColor(CalmDesignSystem.Colors.textTertiary)
-                            
-                            FallbackSubscriptionCard()
-                        }
+                        FallbackSubscriptionCard()
                     }
                     
                     // Required subscription information display (Apple requirement)
