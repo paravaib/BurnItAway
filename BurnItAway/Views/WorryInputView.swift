@@ -67,6 +67,7 @@ struct WorryInputView: View {
                         .font(CalmDesignSystem.Typography.headline)
                         .foregroundColor(CalmDesignSystem.Colors.textPrimary)
                         .multilineTextAlignment(.center)
+                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                     
                     VStack(spacing: CalmDesignSystem.Spacing.sm) {
                         // Check if user has reached daily limit
@@ -144,6 +145,7 @@ struct WorryInputView: View {
                             .padding(.horizontal, CalmDesignSystem.Spacing.sm)
                         }
                     }
+                    .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                     
                     // Symbolic message or limit warning (only show when user can input)
                     if appState.canBurnWorry(isPremium: premium.isPremium) {
