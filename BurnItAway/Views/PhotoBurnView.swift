@@ -134,7 +134,7 @@ struct PhotoBurnView: View {
                                 PhotoPickerView(
                                     selectedImage: $selectedImage,
                                     isPresented: .constant(false)
-                                ) { image in
+                                ) { _ in
                                     // Photo selected - start burn animation
                                     showBurnAnimation = true
                                 }

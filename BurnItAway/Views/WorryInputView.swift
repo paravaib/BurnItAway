@@ -36,170 +36,176 @@ struct WorryInputView: View {
     }
     
     var body: some View {
-        CalmBackground {
-            VStack(spacing: CalmDesignSystem.Spacing.xxl) {
-                // Header
-                VStack(spacing: CalmDesignSystem.Spacing.lg) {
-                    Text("\(ritual.emoji) \(ritual.displayName) Your Worry")
-                        .font(CalmDesignSystem.Typography.largeTitle)
-                        .foregroundColor(CalmDesignSystem.Colors.textPrimary)
-                        .lineLimit(2)
-                        .minimumScaleFactor(0.8)
-                        .allowsTightening(true)
-                        .multilineTextAlignment(.center)
-                    
-                    Text(ritual.description)
-                        .font(CalmDesignSystem.Typography.subheadline)
-                        .foregroundColor(CalmDesignSystem.Colors.textSecondary)
-                        .multilineTextAlignment(.center)
-                        .lineLimit(3)
-                        .minimumScaleFactor(0.7)
-                        .allowsTightening(true)
-                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+        ZStack {
+            // Tap area to dismiss keyboard
+            Color.clear
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
                 }
-                .padding(.top, CalmDesignSystem.Spacing.xxxl)
-                
-                Spacer()
-                
-                // Text Input Section
-                VStack(spacing: CalmDesignSystem.Spacing.lg) {
-                    Text("What's on your mind?")
-                        .font(CalmDesignSystem.Typography.headline)
-                        .foregroundColor(CalmDesignSystem.Colors.textPrimary)
-                        .multilineTextAlignment(.center)
-                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                    
-                    VStack(spacing: CalmDesignSystem.Spacing.sm) {
-                        // Check if user has reached daily limit
-                        if !appState.canBurnWorry(isPremium: premium.isPremium) {
-                            // Show disabled input with daily limit message
-                            VStack(spacing: CalmDesignSystem.Spacing.md) {
-                                TextField("Daily limit reached", text: .constant(""), axis: .vertical)
-                                    .font(CalmDesignSystem.Typography.body)
-                                    .foregroundColor(CalmDesignSystem.Colors.textTertiary)
-                                    .padding(CalmDesignSystem.Spacing.lg)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
-                                            .fill(CalmDesignSystem.Colors.surface.opacity(0.5))
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
-                                                    .stroke(CalmDesignSystem.Colors.warning, lineWidth: 2)
-                                            )
-                                    )
-                                    .lineLimit(3...6)
-                                    .disabled(true)
-                                    .accessibilityLabel("Text input disabled - daily limit reached")
-                                    .accessibilityHint("You've reached your daily limit of 7 rituals")
-                                
-                                Text("You've used all 7 free rituals today")
-                                    .font(CalmDesignSystem.Typography.caption)
-                                    .foregroundColor(CalmDesignSystem.Colors.warning)
-                                    .multilineTextAlignment(.center)
-                                
-                                Button("Upgrade to Premium for Unlimited") {
-                                    HapticFeedback.medium()
-                                    showSubscriptionPaywall = true
-                                }
-                                .buttonStyle(CalmPrimaryButtonStyle(color: CalmDesignSystem.Colors.primary))
-                                .accessibilityLabel("Upgrade to Premium")
-                                .accessibilityHint("Double tap to upgrade for unlimited rituals")
-                            }
-                        } else {
-                            // Normal text input when user can still perform rituals
-                            TextField("Type your worry here...", text: $worryText, axis: .vertical)
-                                .font(CalmDesignSystem.Typography.body)
-                                .foregroundColor(CalmDesignSystem.Colors.textPrimary)
-                                .padding(CalmDesignSystem.Spacing.lg)
-                                .background(
-                                    RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
-                                        .fill(CalmDesignSystem.Colors.surface)
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
-                                                .stroke(
-                                                    isOverLimit ? CalmDesignSystem.Colors.error :
-                                                        isNearLimit ? CalmDesignSystem.Colors.warning :
-                                                        CalmDesignSystem.Colors.glassBorder,
-                                                    lineWidth: isOverLimit ? 2 : 1
-                                                )
-                                        )
-                                )
-                                .lineLimit(3...6)
-                                .accessibilityLabel("Text input for your worry")
-                                .accessibilityHint("Type the worry or thought you want to release")
-                        }
+            
+            CalmBackground {
+                VStack(spacing: CalmDesignSystem.Spacing.xxl) {
+                    // Header
+                    VStack(spacing: CalmDesignSystem.Spacing.lg) {
+                        Text("\(ritual.emoji) \(ritual.displayName) Your Worry")
+                            .font(CalmDesignSystem.Typography.largeTitle)
+                            .foregroundColor(CalmDesignSystem.Colors.textPrimary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.8)
+                            .allowsTightening(true)
+                            .multilineTextAlignment(.center)
                         
-                        // Character counter (only show when user can input)
-                        if appState.canBurnWorry(isPremium: premium.isPremium) {
-                            HStack {
-                                Spacer()
-                                Text("\(worryText.count)/\(maxCharacters)")
-                                    .font(CalmDesignSystem.Typography.caption)
-                                    .foregroundColor(
-                                        isOverLimit ? CalmDesignSystem.Colors.error :
-                                            isNearLimit ? CalmDesignSystem.Colors.warning :
-                                            CalmDesignSystem.Colors.textSecondary
-                                    )
-                                    .animation(.easeInOut(duration: 0.2), value: isOverLimit)
-                                    .animation(.easeInOut(duration: 0.2), value: isNearLimit)
-                            }
-                            .padding(.horizontal, CalmDesignSystem.Spacing.sm)
-                        }
+                        Text(ritual.description)
+                            .font(CalmDesignSystem.Typography.subheadline)
+                            .foregroundColor(CalmDesignSystem.Colors.textSecondary)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(3)
+                            .minimumScaleFactor(0.7)
+                            .allowsTightening(true)
+                            .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                     }
-                    .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                    
-                    // Symbolic message or limit warning (only show when user can input)
-                    if appState.canBurnWorry(isPremium: premium.isPremium) {
-                        Group {
-                            if isOverLimit {
-                                Text("Please shorten your message to continue")
-                                    .font(CalmDesignSystem.Typography.caption)
-                                    .foregroundColor(CalmDesignSystem.Colors.error)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal, CalmDesignSystem.Spacing.lg)
-                            } else if isNearLimit {
-                                Text("Almost at the limit - keep it concise for the best experience")
-                                    .font(CalmDesignSystem.Typography.caption)
-                                    .foregroundColor(CalmDesignSystem.Colors.warning)
-                                    .multilineTextAlignment(.center)
-                                    .padding(.horizontal, CalmDesignSystem.Spacing.lg)
-                            }
-                        }
-                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                    }
+                    .padding(.top, CalmDesignSystem.Spacing.xxxl)
                     
                     Spacer()
                     
-                    // Action Buttons
+                    // Text Input Section
                     VStack(spacing: CalmDesignSystem.Spacing.lg) {
-                        // Only show ritual button when user can perform rituals
-                        if appState.canBurnWorry(isPremium: premium.isPremium) {
-                            Button("\(ritual.emoji) \(ritual.displayName) This Worry") {
-                                if !worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isOverLimit {
-                                    // Store the worry and increment count
-                                    appState.addWorry(worryText, category: "general")
-                                    appState.incrementWorryCount()
+                        Text("What's on your mind?")
+                            .font(CalmDesignSystem.Typography.headline)
+                            .foregroundColor(CalmDesignSystem.Colors.textPrimary)
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                        
+                        VStack(spacing: CalmDesignSystem.Spacing.sm) {
+                            // Check if user has reached daily limit
+                            if !appState.canBurnWorry(isPremium: premium.isPremium) {
+                                // Show disabled input with daily limit message
+                                VStack(spacing: CalmDesignSystem.Spacing.md) {
+                                    TextField("Daily limit reached", text: .constant(""), axis: .vertical)
+                                        .font(CalmDesignSystem.Typography.body)
+                                        .foregroundColor(CalmDesignSystem.Colors.textTertiary)
+                                        .padding(CalmDesignSystem.Spacing.lg)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
+                                                .fill(CalmDesignSystem.Colors.surface.opacity(0.5))
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
+                                                        .stroke(CalmDesignSystem.Colors.warning, lineWidth: 2)
+                                                )
+                                        )
+                                        .lineLimit(3...6)
+                                        .disabled(true)
+                                        .accessibilityLabel("Text input disabled - daily limit reached")
+                                        .accessibilityHint("You've reached your daily limit of 7 rituals")
                                     
-                                    HapticFeedback.medium()
-                                    showRitualAnimation = true
-                                } else if isOverLimit {
-                                    HapticFeedback.error()
+                                    Text("You've used all 7 free rituals today")
+                                        .font(CalmDesignSystem.Typography.caption)
+                                        .foregroundColor(CalmDesignSystem.Colors.warning)
+                                        .multilineTextAlignment(.center)
+                                    
+                                    Button("Upgrade to Premium for Unlimited") {
+                                        HapticFeedback.medium()
+                                        showSubscriptionPaywall = true
+                                    }
+                                    .buttonStyle(CalmPrimaryButtonStyle(color: CalmDesignSystem.Colors.primary))
+                                    .accessibilityLabel("Upgrade to Premium")
+                                    .accessibilityHint("Double tap to upgrade for unlimited rituals")
+                                }
+                            } else {
+                                // Normal text input when user can still perform rituals
+                                TextField("Type your worry here...", text: $worryText, axis: .vertical)
+                                    .font(CalmDesignSystem.Typography.body)
+                                    .foregroundColor(CalmDesignSystem.Colors.textPrimary)
+                                    .padding(CalmDesignSystem.Spacing.lg)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
+                                            .fill(CalmDesignSystem.Colors.surface)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
+                                                    .stroke(
+                                                        isOverLimit ? CalmDesignSystem.Colors.error :
+                                                            isNearLimit ? CalmDesignSystem.Colors.warning :
+                                                            CalmDesignSystem.Colors.glassBorder,
+                                                        lineWidth: isOverLimit ? 2 : 1
+                                                    )
+                                            )
+                                    )
+                                    .lineLimit(3...6)
+                                    .accessibilityLabel("Text input for your worry")
+                                    .accessibilityHint("Type the worry or thought you want to release")
+                            }
+                            
+                            // Character counter (only show when user can input)
+                            if appState.canBurnWorry(isPremium: premium.isPremium) {
+                                HStack {
+                                    Spacer()
+                                    Text("\(worryText.count)/\(maxCharacters)")
+                                        .font(CalmDesignSystem.Typography.caption)
+                                        .foregroundColor(
+                                            isOverLimit ? CalmDesignSystem.Colors.error :
+                                                isNearLimit ? CalmDesignSystem.Colors.warning :
+                                                CalmDesignSystem.Colors.textSecondary
+                                        )
+                                        .animation(.easeInOut(duration: 0.2), value: isOverLimit)
+                                        .animation(.easeInOut(duration: 0.2), value: isNearLimit)
+                                }
+                                .padding(.horizontal, CalmDesignSystem.Spacing.sm)
+                            }
+                        }
+                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                        
+                        // Symbolic message or limit warning (only show when user can input)
+                        if appState.canBurnWorry(isPremium: premium.isPremium) {
+                            Group {
+                                if isOverLimit {
+                                    Text("Please shorten your message to continue")
+                                        .font(CalmDesignSystem.Typography.caption)
+                                        .foregroundColor(CalmDesignSystem.Colors.error)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, CalmDesignSystem.Spacing.lg)
+                                } else if isNearLimit {
+                                    Text("Almost at the limit - keep it concise for the best experience")
+                                        .font(CalmDesignSystem.Typography.caption)
+                                        .foregroundColor(CalmDesignSystem.Colors.warning)
+                                        .multilineTextAlignment(.center)
+                                        .padding(.horizontal, CalmDesignSystem.Spacing.lg)
                                 }
                             }
-                            .buttonStyle(CalmPrimaryButtonStyle(color: ritual.calmColor))
-                            .disabled(worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isOverLimit)
-                            .accessibilityLabel("\(ritual.displayName) this worry")
-                            .accessibilityHint(isOverLimit ? "Text is too long. Please shorten your message." : "Double tap to start the \(ritual.displayName.lowercased()) ritual")
-                            .accessibilityAddTraits(.isButton)
+                            .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                         }
                         
+                        Spacer()
+                        
+                        // Action Buttons
+                        VStack(spacing: CalmDesignSystem.Spacing.lg) {
+                            // Only show ritual button when user can perform rituals
+                            if appState.canBurnWorry(isPremium: premium.isPremium) {
+                                Button("\(ritual.emoji) \(ritual.displayName) This Worry") {
+                                    if !worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isOverLimit {
+                                        // Store the worry and increment count
+                                        appState.addWorry(worryText, category: "general")
+                                        appState.incrementWorryCount()
+                                        
+                                        HapticFeedback.medium()
+                                        showRitualAnimation = true
+                                    } else if isOverLimit {
+                                        HapticFeedback.error()
+                                    }
+                                }
+                                .buttonStyle(CalmPrimaryButtonStyle(color: ritual.calmColor))
+                                .disabled(worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isOverLimit)
+                                .accessibilityLabel("\(ritual.displayName) this worry")
+                                .accessibilityHint(isOverLimit ? "Text is too long. Please shorten your message." : "Double tap to start the \(ritual.displayName.lowercased()) ritual")
+                                .accessibilityAddTraits(.isButton)
+                            }
+                            
+                        }
+                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                        .padding(.bottom, CalmDesignSystem.Spacing.xxxl)
                     }
-                    .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                    .padding(.bottom, CalmDesignSystem.Spacing.xxxl)
                 }
-            }
-            .onTapGesture {
-                // Dismiss keyboard when tapping outside text field
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                .allowsHitTesting(true)
             }
             .navigationBarBackButtonHidden(false)
             .fullScreenCover(isPresented: $showRitualAnimation) {
@@ -316,10 +322,10 @@ struct WorryInputView: View {
             }
         }
     }
-    
-    #Preview {
-        NavigationStack {
-            WorryInputView(ritual: .burn)
-        }
+}
+
+#Preview {
+    NavigationStack {
+        WorryInputView(ritual: .burn)
     }
 }

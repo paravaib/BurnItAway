@@ -14,9 +14,17 @@ struct EnhancedBurnView: View {
     @EnvironmentObject var premium: PremiumState
     
     var body: some View {
-        CalmBackground {
-            ScrollView {
-                VStack(spacing: 0) {
+        ZStack {
+            // Tap area to dismiss keyboard
+            Color.clear
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    isTextFieldFocused = false
+                }
+            
+            CalmBackground {
+                ScrollView {
+                    VStack(spacing: 0) {
                     // Header
                     VStack(spacing: CalmDesignSystem.Spacing.lg) {
                         Spacer().frame(height: 20)
@@ -104,6 +112,8 @@ struct EnhancedBurnView: View {
                     Spacer().frame(height: 100) // Extra space for keyboard
                 }
             }
+            .allowsHitTesting(true)
+        }
         }
         .navigationBarBackButtonHidden(false)
         .navigationDestination(isPresented: $navigateToAnimation) {
@@ -138,10 +148,6 @@ struct EnhancedBurnView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 isTextFieldFocused = true
             }
-        }
-        .onTapGesture {
-            // Dismiss keyboard when tapping outside text field
-            isTextFieldFocused = false
         }
     }
     
