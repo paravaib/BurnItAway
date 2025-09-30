@@ -36,289 +36,283 @@ struct WorryInputView: View {
     }
     
     var body: some View {
-        ZStack {
-            // Tap area to dismiss keyboard
-            Color.clear
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        CalmBackground {
+            VStack(spacing: CalmDesignSystem.Spacing.xxl) {
+                // Header
+                VStack(spacing: CalmDesignSystem.Spacing.lg) {
+                    Text("\(ritual.emoji) \(ritual.displayName) Your Worry")
+                        .font(CalmDesignSystem.Typography.largeTitle)
+                        .foregroundColor(CalmDesignSystem.Colors.textPrimary)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+                        .allowsTightening(true)
+                        .multilineTextAlignment(.center)
+                    
+                    Text(ritual.description)
+                        .font(CalmDesignSystem.Typography.subheadline)
+                        .foregroundColor(CalmDesignSystem.Colors.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .lineLimit(3)
+                        .minimumScaleFactor(0.7)
+                        .allowsTightening(true)
+                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                 }
-            
-            CalmBackground {
-                VStack(spacing: CalmDesignSystem.Spacing.xxl) {
-                    // Header
-                    VStack(spacing: CalmDesignSystem.Spacing.lg) {
-                        Text("\(ritual.emoji) \(ritual.displayName) Your Worry")
-                            .font(CalmDesignSystem.Typography.largeTitle)
-                            .foregroundColor(CalmDesignSystem.Colors.textPrimary)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.8)
-                            .allowsTightening(true)
-                            .multilineTextAlignment(.center)
-                        
-                        Text(ritual.description)
-                            .font(CalmDesignSystem.Typography.subheadline)
-                            .foregroundColor(CalmDesignSystem.Colors.textSecondary)
-                            .multilineTextAlignment(.center)
-                            .lineLimit(3)
-                            .minimumScaleFactor(0.7)
-                            .allowsTightening(true)
-                            .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                    }
-                    .padding(.top, CalmDesignSystem.Spacing.xxxl)
+                .padding(.top, CalmDesignSystem.Spacing.xxxl)
+                
+                Spacer()
+                
+                // Text Input Section
+                VStack(spacing: CalmDesignSystem.Spacing.lg) {
+                    Text("What's on your mind?")
+                        .font(CalmDesignSystem.Typography.headline)
+                        .foregroundColor(CalmDesignSystem.Colors.textPrimary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                     
-                    Spacer()
-                    
-                    // Text Input Section
-                    VStack(spacing: CalmDesignSystem.Spacing.lg) {
-                        Text("What's on your mind?")
-                            .font(CalmDesignSystem.Typography.headline)
-                            .foregroundColor(CalmDesignSystem.Colors.textPrimary)
-                            .multilineTextAlignment(.center)
-                            .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                        
-                        VStack(spacing: CalmDesignSystem.Spacing.sm) {
-                            // Check if user has reached daily limit
-                            if !appState.canBurnWorry(isPremium: premium.isPremium) {
-                                // Show disabled input with daily limit message
-                                VStack(spacing: CalmDesignSystem.Spacing.md) {
-                                    TextField("Daily limit reached", text: .constant(""), axis: .vertical)
-                                        .font(CalmDesignSystem.Typography.body)
-                                        .foregroundColor(CalmDesignSystem.Colors.textTertiary)
-                                        .padding(CalmDesignSystem.Spacing.lg)
-                                        .background(
-                                            RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
-                                                .fill(CalmDesignSystem.Colors.surface.opacity(0.5))
-                                                .overlay(
-                                                    RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
-                                                        .stroke(CalmDesignSystem.Colors.warning, lineWidth: 2)
-                                                )
-                                        )
-                                        .lineLimit(3...6)
-                                        .disabled(true)
-                                        .accessibilityLabel("Text input disabled - daily limit reached")
-                                        .accessibilityHint("You've reached your daily limit of 7 rituals")
-                                    
-                                    Text("You've used all 7 free rituals today")
-                                        .font(CalmDesignSystem.Typography.caption)
-                                        .foregroundColor(CalmDesignSystem.Colors.warning)
-                                        .multilineTextAlignment(.center)
-                                    
-                                    Button("Upgrade to Premium for Unlimited") {
-                                        HapticFeedback.medium()
-                                        showSubscriptionPaywall = true
-                                    }
-                                    .buttonStyle(CalmPrimaryButtonStyle(color: CalmDesignSystem.Colors.primary))
-                                    .accessibilityLabel("Upgrade to Premium")
-                                    .accessibilityHint("Double tap to upgrade for unlimited rituals")
-                                }
-                            } else {
-                                // Normal text input when user can still perform rituals
-                                TextField("Type your worry here...", text: $worryText, axis: .vertical)
+                    VStack(spacing: CalmDesignSystem.Spacing.sm) {
+                        // Check if user has reached daily limit
+                        if !appState.canBurnWorry(isPremium: premium.isPremium) {
+                            // Show disabled input with daily limit message
+                            VStack(spacing: CalmDesignSystem.Spacing.md) {
+                                TextField("Daily limit reached", text: .constant(""), axis: .vertical)
                                     .font(CalmDesignSystem.Typography.body)
-                                    .foregroundColor(CalmDesignSystem.Colors.textPrimary)
+                                    .foregroundColor(CalmDesignSystem.Colors.textTertiary)
                                     .padding(CalmDesignSystem.Spacing.lg)
                                     .background(
                                         RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
-                                            .fill(CalmDesignSystem.Colors.surface)
+                                            .fill(CalmDesignSystem.Colors.surface.opacity(0.5))
                                             .overlay(
                                                 RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
-                                                    .stroke(
-                                                        isOverLimit ? CalmDesignSystem.Colors.error :
-                                                            isNearLimit ? CalmDesignSystem.Colors.warning :
-                                                            CalmDesignSystem.Colors.glassBorder,
-                                                        lineWidth: isOverLimit ? 2 : 1
-                                                    )
+                                                    .stroke(CalmDesignSystem.Colors.warning, lineWidth: 2)
                                             )
                                     )
                                     .lineLimit(3...6)
-                                    .accessibilityLabel("Text input for your worry")
-                                    .accessibilityHint("Type the worry or thought you want to release")
+                                    .disabled(true)
+                                    .accessibilityLabel("Text input disabled - daily limit reached")
+                                    .accessibilityHint("You've reached your daily limit of 7 rituals")
+                                
+                                Text("You've used all 7 free rituals today")
+                                    .font(CalmDesignSystem.Typography.caption)
+                                    .foregroundColor(CalmDesignSystem.Colors.warning)
+                                    .multilineTextAlignment(.center)
+                                
+                                Button("Upgrade to Premium for Unlimited") {
+                                    HapticFeedback.medium()
+                                    showSubscriptionPaywall = true
+                                }
+                                .buttonStyle(CalmPrimaryButtonStyle(color: CalmDesignSystem.Colors.primary))
+                                .accessibilityLabel("Upgrade to Premium")
+                                .accessibilityHint("Double tap to upgrade for unlimited rituals")
                             }
-                            
-                            // Character counter (only show when user can input)
-                            if appState.canBurnWorry(isPremium: premium.isPremium) {
-                                HStack {
-                                    Spacer()
-                                    Text("\(worryText.count)/\(maxCharacters)")
-                                        .font(CalmDesignSystem.Typography.caption)
-                                        .foregroundColor(
-                                            isOverLimit ? CalmDesignSystem.Colors.error :
-                                                isNearLimit ? CalmDesignSystem.Colors.warning :
-                                                CalmDesignSystem.Colors.textSecondary
+                        } else {
+                            // Normal text input when user can still perform rituals
+                            TextField("Type your worry here...", text: $worryText, axis: .vertical)
+                                .font(CalmDesignSystem.Typography.body)
+                                .foregroundColor(CalmDesignSystem.Colors.textPrimary)
+                                .padding(CalmDesignSystem.Spacing.lg)
+                                .background(
+                                    RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
+                                        .fill(CalmDesignSystem.Colors.surface)
+                                        .overlay(
+                                            RoundedRectangle(cornerRadius: CalmDesignSystem.CornerRadius.lg)
+                                                .stroke(
+                                                    isOverLimit ? CalmDesignSystem.Colors.error :
+                                                        isNearLimit ? CalmDesignSystem.Colors.warning :
+                                                        CalmDesignSystem.Colors.glassBorder,
+                                                    lineWidth: isOverLimit ? 2 : 1
+                                                )
                                         )
-                                        .animation(.easeInOut(duration: 0.2), value: isOverLimit)
-                                        .animation(.easeInOut(duration: 0.2), value: isNearLimit)
-                                }
-                                .padding(.horizontal, CalmDesignSystem.Spacing.sm)
-                            }
+                                )
+                                .lineLimit(3...6)
+                                .accessibilityLabel("Text input for your worry")
+                                .accessibilityHint("Type the worry or thought you want to release")
                         }
-                        .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                         
-                        // Symbolic message or limit warning (only show when user can input)
+                        // Character counter (only show when user can input)
                         if appState.canBurnWorry(isPremium: premium.isPremium) {
-                            Group {
-                                if isOverLimit {
-                                    Text("Please shorten your message to continue")
-                                        .font(CalmDesignSystem.Typography.caption)
-                                        .foregroundColor(CalmDesignSystem.Colors.error)
-                                        .multilineTextAlignment(.center)
-                                        .padding(.horizontal, CalmDesignSystem.Spacing.lg)
-                                } else if isNearLimit {
-                                    Text("Almost at the limit - keep it concise for the best experience")
-                                        .font(CalmDesignSystem.Typography.caption)
-                                        .foregroundColor(CalmDesignSystem.Colors.warning)
-                                        .multilineTextAlignment(.center)
-                                        .padding(.horizontal, CalmDesignSystem.Spacing.lg)
-                                }
+                            HStack {
+                                Spacer()
+                                Text("\(worryText.count)/\(maxCharacters)")
+                                    .font(CalmDesignSystem.Typography.caption)
+                                    .foregroundColor(
+                                        isOverLimit ? CalmDesignSystem.Colors.error :
+                                            isNearLimit ? CalmDesignSystem.Colors.warning :
+                                            CalmDesignSystem.Colors.textSecondary
+                                    )
+                                    .animation(.easeInOut(duration: 0.2), value: isOverLimit)
+                                    .animation(.easeInOut(duration: 0.2), value: isNearLimit)
                             }
-                            .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                            .padding(.horizontal, CalmDesignSystem.Spacing.sm)
                         }
-                        
-                        Spacer()
-                        
-                        // Action Buttons
-                        VStack(spacing: CalmDesignSystem.Spacing.lg) {
-                            // Only show ritual button when user can perform rituals
-                            if appState.canBurnWorry(isPremium: premium.isPremium) {
-                                Button("\(ritual.emoji) \(ritual.displayName) This Worry") {
-                                    if !worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isOverLimit {
-                                        // Store the worry and increment count
-                                        appState.addWorry(worryText, category: "general")
-                                        appState.incrementWorryCount()
-                                        
-                                        HapticFeedback.medium()
-                                        showRitualAnimation = true
-                                    } else if isOverLimit {
-                                        HapticFeedback.error()
-                                    }
-                                }
-                                .buttonStyle(CalmPrimaryButtonStyle(color: ritual.calmColor))
-                                .disabled(worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isOverLimit)
-                                .accessibilityLabel("\(ritual.displayName) this worry")
-                                .accessibilityHint(isOverLimit ? "Text is too long. Please shorten your message." : "Double tap to start the \(ritual.displayName.lowercased()) ritual")
-                                .accessibilityAddTraits(.isButton)
+                    }
+                    .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                    
+                    // Symbolic message or limit warning (only show when user can input)
+                    if appState.canBurnWorry(isPremium: premium.isPremium) {
+                        Group {
+                            if isOverLimit {
+                                Text("Please shorten your message to continue")
+                                    .font(CalmDesignSystem.Typography.caption)
+                                    .foregroundColor(CalmDesignSystem.Colors.error)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, CalmDesignSystem.Spacing.lg)
+                            } else if isNearLimit {
+                                Text("Almost at the limit - keep it concise for the best experience")
+                                    .font(CalmDesignSystem.Typography.caption)
+                                    .foregroundColor(CalmDesignSystem.Colors.warning)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, CalmDesignSystem.Spacing.lg)
                             }
-                            
                         }
                         .padding(.horizontal, CalmDesignSystem.Spacing.xl)
-                        .padding(.bottom, CalmDesignSystem.Spacing.xxxl)
                     }
+                    
+                    Spacer()
+                    
+                    // Action Buttons
+                    VStack(spacing: CalmDesignSystem.Spacing.lg) {
+                        // Only show ritual button when user can perform rituals
+                        if appState.canBurnWorry(isPremium: premium.isPremium) {
+                            Button("\(ritual.emoji) \(ritual.displayName) This Worry") {
+                                if !worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !isOverLimit {
+                                    // Store the worry and increment count
+                                    appState.addWorry(worryText, category: "general")
+                                    appState.incrementWorryCount()
+                                    
+                                    HapticFeedback.medium()
+                                    showRitualAnimation = true
+                                } else if isOverLimit {
+                                    HapticFeedback.error()
+                                }
+                            }
+                            .buttonStyle(CalmPrimaryButtonStyle(color: ritual.calmColor))
+                            .disabled(worryText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isOverLimit)
+                            .accessibilityLabel("\(ritual.displayName) this worry")
+                            .accessibilityHint(isOverLimit ? "Text is too long. Please shorten your message." : "Double tap to start the \(ritual.displayName.lowercased()) ritual")
+                            .accessibilityAddTraits(.isButton)
+                        }
+                        
+                    }
+                    .padding(.horizontal, CalmDesignSystem.Spacing.xl)
+                    .padding(.bottom, CalmDesignSystem.Spacing.xxxl)
                 }
-                .allowsHitTesting(true)
             }
-            .navigationBarBackButtonHidden(false)
-            .fullScreenCover(isPresented: $showRitualAnimation) {
-                RitualAnimationView(
-                    ritual: ritual,
-                    text: worryText,
-                    onComplete: {
-                        // Dismiss back to RitualSelectionView
-                        showRitualAnimation = false
-                        dismiss()
-                    },
-                    onRitualCompleted: onRitualCompleted
-                )
-                .ignoresSafeArea(.all)
-            }
-            .sheet(isPresented: $showSubscriptionPaywall) {
-                SubscriptionPaywallView()
-            }
+        }
+        .navigationBarBackButtonHidden(false)
+        .fullScreenCover(isPresented: $showRitualAnimation) {
+            RitualAnimationView(
+                ritual: ritual,
+                text: worryText,
+                onComplete: {
+                    // Dismiss back to RitualSelectionView
+                    showRitualAnimation = false
+                    dismiss()
+                },
+                onRitualCompleted: onRitualCompleted
+            )
+            .ignoresSafeArea(.all)
+        }
+        .sheet(isPresented: $showSubscriptionPaywall) {
+            SubscriptionPaywallView()
+        }
+        .onTapGesture {
+            // Dismiss keyboard when tapping outside text field
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
     }
+}
+
+// Helper view to wrap different ritual animations
+struct RitualAnimationView: View {
+    let ritual: RitualType
+    let text: String
+    let onComplete: () -> Void
+    let onRitualCompleted: (() -> Void)?
+    @State private var showingCelebration = false
     
-    // Helper view to wrap different ritual animations
-    struct RitualAnimationView: View {
-        let ritual: RitualType
-        let text: String
-        let onComplete: () -> Void
-        let onRitualCompleted: (() -> Void)?
-        @State private var showingCelebration = false
-        
-        init(ritual: RitualType, text: String, onComplete: @escaping () -> Void, onRitualCompleted: (() -> Void)? = nil) {
-            self.ritual = ritual
-            self.text = text
-            self.onComplete = onComplete
-            self.onRitualCompleted = onRitualCompleted
-        }
-        
-        var body: some View {
-            ZStack {
-                // Ritual Animation (background)
-                Group {
-                    switch ritual {
-                    case .burn:
-                        EnhancedRitualView(ritualType: "burn", text: text, onComplete: {
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                showingCelebration = true
-                            }
-                        })
-                    case .smoke:
-                        EnhancedRitualView(ritualType: "smoke", text: text, onComplete: {
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                showingCelebration = true
-                            }
-                        })
-                    case .space:
-                        EnhancedRitualView(ritualType: "space", text: text, onComplete: {
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                showingCelebration = true
-                            }
-                        })
-                    case .wash:
-                        EnhancedRitualView(ritualType: "wash", text: text, onComplete: {
-                            withAnimation(.easeInOut(duration: 0.5)) {
-                                showingCelebration = true
-                            }
-                        })
-                    }
+    init(ritual: RitualType, text: String, onComplete: @escaping () -> Void, onRitualCompleted: (() -> Void)? = nil) {
+        self.ritual = ritual
+        self.text = text
+        self.onComplete = onComplete
+        self.onRitualCompleted = onRitualCompleted
+    }
+    
+    var body: some View {
+        ZStack {
+            // Ritual Animation (background)
+            Group {
+                switch ritual {
+                case .burn:
+                    EnhancedRitualView(ritualType: "burn", text: text, onComplete: {
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            showingCelebration = true
+                        }
+                    })
+                case .smoke:
+                    EnhancedRitualView(ritualType: "smoke", text: text, onComplete: {
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            showingCelebration = true
+                        }
+                    })
+                case .space:
+                    EnhancedRitualView(ritualType: "space", text: text, onComplete: {
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            showingCelebration = true
+                        }
+                    })
+                case .wash:
+                    EnhancedRitualView(ritualType: "wash", text: text, onComplete: {
+                        withAnimation(.easeInOut(duration: 0.5)) {
+                            showingCelebration = true
+                        }
+                    })
                 }
-                .opacity(showingCelebration ? 0.0 : 1.0)
+            }
+            .opacity(showingCelebration ? 0.0 : 1.0)
+            .animation(.easeInOut(duration: 0.5), value: showingCelebration)
+            
+            // Simple completion message (overlay)
+            if showingCelebration {
+                VStack(spacing: 30) {
+                    Spacer()
+                    
+                    VStack(spacing: 20) {
+                        Text("✨")
+                            .font(.system(size: 80))
+                            .scaleEffect(1.2)
+                            .animation(.spring(response: 0.6, dampingFraction: 0.6), value: showingCelebration)
+                        
+                        Text("It's released.")
+                            .font(.system(size: 36, weight: .light, design: .rounded))
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                            .opacity(showingCelebration ? 1.0 : 0.0)
+                            .animation(.easeInOut(duration: 1.0).delay(0.5), value: showingCelebration)
+                        
+                        Text("Rest now.")
+                            .font(.system(size: 22, weight: .regular))
+                            .foregroundColor(.white.opacity(0.8))
+                            .multilineTextAlignment(.center)
+                            .opacity(showingCelebration ? 1.0 : 0.0)
+                            .animation(.easeInOut(duration: 1.0).delay(1.0), value: showingCelebration)
+                    }
+                    
+                    Spacer()
+                    
+                    Button("Continue") {
+                        // Just dismiss back to RitualSelectionView
+                        onComplete()
+                    }
+                    .buttonStyle(CalmPrimaryButtonStyle(color: ritual.calmColor))
+                    .opacity(showingCelebration ? 1.0 : 0.0)
+                    .animation(.easeInOut(duration: 1.0).delay(2.0), value: showingCelebration)
+                    
+                    Spacer()
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(Color.black.opacity(0.9))
+                .transition(.opacity.combined(with: .scale(scale: 0.95)))
                 .animation(.easeInOut(duration: 0.5), value: showingCelebration)
-                
-                // Simple completion message (overlay)
-                if showingCelebration {
-                    VStack(spacing: 30) {
-                        Spacer()
-                        
-                        VStack(spacing: 20) {
-                            Text("✨")
-                                .font(.system(size: 80))
-                                .scaleEffect(1.2)
-                                .animation(.spring(response: 0.6, dampingFraction: 0.6), value: showingCelebration)
-                            
-                            Text("It's released.")
-                                .font(.system(size: 36, weight: .light, design: .rounded))
-                                .foregroundColor(.white)
-                                .multilineTextAlignment(.center)
-                                .opacity(showingCelebration ? 1.0 : 0.0)
-                                .animation(.easeInOut(duration: 1.0).delay(0.5), value: showingCelebration)
-                            
-                            Text("Rest now.")
-                                .font(.system(size: 22, weight: .regular))
-                                .foregroundColor(.white.opacity(0.8))
-                                .multilineTextAlignment(.center)
-                                .opacity(showingCelebration ? 1.0 : 0.0)
-                                .animation(.easeInOut(duration: 1.0).delay(1.0), value: showingCelebration)
-                        }
-                        
-                        Spacer()
-                        
-                        Button("Continue") {
-                            // Just dismiss back to RitualSelectionView
-                            onComplete()
-                        }
-                        .buttonStyle(CalmPrimaryButtonStyle(color: ritual.calmColor))
-                        .opacity(showingCelebration ? 1.0 : 0.0)
-                        .animation(.easeInOut(duration: 1.0).delay(2.0), value: showingCelebration)
-                        
-                        Spacer()
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color.black.opacity(0.9))
-                    .transition(.opacity.combined(with: .scale(scale: 0.95)))
-                    .animation(.easeInOut(duration: 0.5), value: showingCelebration)
-                }
             }
         }
     }
@@ -327,5 +321,7 @@ struct WorryInputView: View {
 #Preview {
     NavigationStack {
         WorryInputView(ritual: .burn)
+            .environmentObject(AppState())
+            .environmentObject(PremiumState())
     }
 }

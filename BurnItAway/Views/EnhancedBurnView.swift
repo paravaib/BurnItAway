@@ -14,17 +14,9 @@ struct EnhancedBurnView: View {
     @EnvironmentObject var premium: PremiumState
     
     var body: some View {
-        ZStack {
-            // Tap area to dismiss keyboard
-            Color.clear
-                .contentShape(Rectangle())
-                .onTapGesture {
-                    isTextFieldFocused = false
-                }
-            
-            CalmBackground {
-                ScrollView {
-                    VStack(spacing: 0) {
+        CalmBackground {
+            ScrollView {
+                VStack(spacing: 0) {
                     // Header
                     VStack(spacing: CalmDesignSystem.Spacing.lg) {
                         Spacer().frame(height: 20)
@@ -72,14 +64,13 @@ struct EnhancedBurnView: View {
                                     .frame(minHeight: 120)
                                     .focused($isTextFieldFocused)
                             }
-                                .onChange(of: worryText) { _ in
-                                    // Clear any previous state when text changes
-                                    if worryText.isEmpty {
-                                        return
-                                    }
-                                    
-                                    // AI services removed - keeping simple worry burning experience
+                            .onChange(of: worryText) { _ in
+                                // Clear any previous state when text changes
+                                if worryText.isEmpty {
+                                    return
                                 }
+                                // AI services removed - keeping simple worry burning experience
+                            }
                         }
                         .padding(.horizontal, CalmDesignSystem.Spacing.xl)
                         
@@ -112,9 +103,17 @@ struct EnhancedBurnView: View {
                     Spacer().frame(height: 100) // Extra space for keyboard
                 }
             }
-            .allowsHitTesting(true)
+            // Let dragging the scroll view dismiss the keyboard naturally
+            .scrollDismissesKeyboard(.interactively)
         }
-        }
+        // Tap outside to dismiss keyboard without stealing taps from TextEditor
+        .background(
+            Color.clear
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    isTextFieldFocused = false
+                }
+        )
         .navigationBarBackButtonHidden(false)
         .navigationDestination(isPresented: $navigateToAnimation) {
             CalmBurnAnimationView(worryText: worryText) {
